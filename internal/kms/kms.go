@@ -41,6 +41,8 @@ type KMSType interface {
 type ConfigProvider string
 
 const (
+	// BJJMetakeepKeyProvider is a key provider for BabyJubJub keys through Metakeep
+	BJJMetakeepKeyProvider ConfigProvider = "metakeep"
 	// BJJVaultKeyProvider is a key provider for BabyJubJub keys in vault
 	BJJVaultKeyProvider ConfigProvider = "vault"
 	// BJJLocalStorageKeyProvider is a key provider for BabyJubJub keys in local storage
@@ -289,6 +291,14 @@ func OpenWithConfig(ctx context.Context, config Config) (*KMS, error) {
 
 	if config.ETHKeyProvider == "" {
 		return nil, errors.New("Ethereum key provider is not provided")
+	}
+
+	if config.BJJKeyProvider == BJJMetakeepKeyProvider {
+		bjjKeyProvider = NewMetaKeepBJJKeyProvider(LoadMetaKeepConfig())
+		if err != nil {
+			return nil, fmt.Errorf("cannot create BabyJubJub key provider: %+v", err)
+		}
+		log.Info(ctx, "BabyJubJub key provider created", "provider:", BJJMetakeepKeyProvider)
 	}
 
 	if config.BJJKeyProvider == BJJVaultKeyProvider {
