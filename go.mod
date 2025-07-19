@@ -353,4 +353,4 @@ require (
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
 
-replace github.com/iden3/go-iden3-core/v2 => github.com/gettrustid/go-iden3-core/v2 v2.0.2
+replace github.com/iden3/go-iden3-core/v2 => github.com/gettrustid/go-iden3-core/v2 v2.0.3
