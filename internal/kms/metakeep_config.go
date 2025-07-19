@@ -12,7 +12,7 @@ type MetaKeepConfig struct {
 // TODO: revist switching out env
 func LoadMetaKeepConfig() *MetaKeepConfig {
 	return &MetaKeepConfig{
-		BjjAppApiKey:    os.Getenv("METAKEEP_BJJ_API_KEY"),
-		BjjAppApiSecret: os.Getenv("METAKEEP_BJJ_API_SECRET"),
+		BjjAppApiKey:    os.Getenv("METAKEEP_BJJ_APP_API_KEY"),
+		BjjAppApiSecret: os.Getenv("METAKEEP_BJJ_APP_API_SECRET"),
 	}
 }
