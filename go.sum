@@ -229,6 +229,8 @@ github.com/getkin/kin-openapi v0.128.0 h1:jqq3D9vC9pPq1dGcOCv7yOp1DaEe7c/T1vzcLb
 github.com/getkin/kin-openapi v0.128.0/go.mod h1:OZrfXzUfGrNbsKj+xmFBx6E5c6yH3At/tAKSc2UszXM=
 github.com/getsentry/sentry-go v0.27.0 h1:Pv98CIbtB3LkMWmXi4Joa5OOcwbmnX88sF5qbK3r3Ps=
 github.com/getsentry/sentry-go v0.27.0/go.mod h1:lc76E2QywIyW8WuBnwl8Lc4bkmQH4+w1gwTf25trprY=
+github.com/gettrustid/go-iden3-core/v2 v2.0.3 h1:DEwm8pgYr2LSTGBt71LdU5ZwKYoG23JGSG1V4fpRWqs=
+github.com/gettrustid/go-iden3-core/v2 v2.0.3/go.mod h1:8vmG6y8k9VS7iNoxuiKukKbRQFsMyabCc+i8er07zOs=
 github.com/ghostiam/protogetter v0.3.8 h1:LYcXbYvybUyTIxN2Mj9h6rHrDZBDwZloPoKctWrFyJY=
 github.com/ghostiam/protogetter v0.3.8/go.mod h1:WZ0nw9pfzsgxuRsPOFQomgDVSWtDLJRfQJEhsGbmQMA=
 github.com/go-chi/chi/v5 v5.1.0 h1:acVI1TYaD+hhedDJ3r54HyA6sExp3HfXq7QWEEY/xMw=
@@ -430,8 +432,6 @@ github.com/iden3/go-iden3-auth/v2 v2.7.2 h1:Zx6skjjlNQqxLyXTMGMNZXOzeUTeGLgt0F1I
 github.com/iden3/go-iden3-auth/v2 v2.7.2/go.mod h1:WlaKWKWYsnO1touddRCzyaNinn91Gr6j3dGwlQLHfMw=
 github.com/iden3/go-iden3-core v1.0.2 h1:HwNDFeqcUv4ybZj5tH+58JKWKarn/qqBpNCqTLxGP0Y=
 github.com/iden3/go-iden3-core v1.0.2/go.mod h1:X4PjlJG8OsEQEsSbzzYqqAk2olYGZ2nuGqiUPyEYjOo=
-github.com/iden3/go-iden3-core/v2 v2.3.2 h1:kZq/TiSUmBKO/mvPUucfFE45ugTW+hXXlGT+Jf6CQTg=
-github.com/iden3/go-iden3-core/v2 v2.3.2/go.mod h1:8vmG6y8k9VS7iNoxuiKukKbRQFsMyabCc+i8er07zOs=
 github.com/iden3/go-iden3-crypto v0.0.17 h1:NdkceRLJo/pI4UpcjVah4lN/a3yzxRUGXqxbWcYh9mY=
 github.com/iden3/go-iden3-crypto v0.0.17/go.mod h1:dLpM4vEPJ3nDHzhWFXDjzkn1qHoBeOT/3UEhXsEsP3E=
 github.com/iden3/go-jwz/v2 v2.2.1 h1:ciVvaDKfldvs+1Ru0uUjsIKU7GczBlNc7yYE2n9n0VE=
