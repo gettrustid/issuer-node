@@ -35,6 +35,6 @@ postgresIssuerNode:
     postgresUser: polygonid
     postgresName: postgres-secret  
   pvc:
-    storageRequest: 5Gi
+    storageRequest: 8Gi
     volumeName: postgresdata
     postgres: postgresql-issuer-node-pvc

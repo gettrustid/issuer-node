@@ -3,29 +3,40 @@ kind: Deployment
 metadata:
   name: {{ .Values.uiIssuerNode.deployment.name}}
   labels:
-    {{- include "privadoid-issuer.uiIssuerNode.deploymentLabels" . | nindent 4 }}
-    {{- include "privadoid-issuer.labels" . | nindent 4 }}
+    {{- include "trustid-issuer.uiIssuerNode.deploymentLabels" . | nindent 4 }}
+    {{- include "trustid-issuer.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.uiIssuerNode.deployment.replicaCount }}
   selector:
     matchLabels:
-      {{- include "privadoid-issuer.uiIssuerNode.Labels" . | nindent 6 }}
-      {{- include "privadoid-issuer.selectorLabels" . | nindent 6 }}
+      {{- include "trustid-issuer.uiIssuerNode.Labels" . | nindent 6 }}
+      {{- include "trustid-issuer.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "privadoid-issuer.uiIssuerNode.Labels" . | nindent 8 }}
-        {{- include "privadoid-issuer.selectorLabels" . | nindent 8 }}
+        {{- include "trustid-issuer.uiIssuerNode.Labels" . | nindent 8 }}
+        {{- include "trustid-issuer.selectorLabels" . | nindent 8 }}
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: {{ include "helpers.serviceAccountName" . }}
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure"
       containers:
         - name: {{ .Values.uiIssuerNode.deployment.containerName }}
           image: {{ .Values.issuernode_ui_repository_image }}:{{ .Values.issuernode_ui_repository_tag }}
           imagePullPolicy: {{ .Values.uiIssuerNode.deployment.imagePullPolicy | quote }}
           ports:
           - containerPort: {{ .Values.uiIssuerNode.deployment.containerPort }}
+          volumeMounts:
+            - name: secrets-store
+              mountPath: /mnt/secrets-store
+              readOnly: true
           envFrom:
           - configMapRef:
               name: {{ .Values.uiIssuerNode.deployment.uiconfigMapRef }}

@@ -4,19 +4,19 @@ kind: StatefulSet
 metadata:
   name: {{ .Values.vaultIssuerNode.deployment.name }}
   labels:
-    {{- include "privadoid-issuer.vaultIssuerNode.deploymentLabels" . | nindent 4 }}
-    {{- include "privadoid-issuer.vaultIssuerNode.common.labels" . | nindent 4 }}
+    {{- include "trustid-issuer.vaultIssuerNode.deploymentLabels" . | nindent 4 }}
+    {{- include "trustid-issuer.vaultIssuerNode.common.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.vaultIssuerNode.deployment.replicaCount }}
   selector:
     matchLabels:
-      {{- include "privadoid-issuer.vaultIssuerNode.Labels" . | nindent 6 }}
-      {{- include "privadoid-issuer.vaultIssuerNode.selectorLabels" . | nindent 6 }}
+      {{- include "trustid-issuer.vaultIssuerNode.Labels" . | nindent 6 }}
+      {{- include "trustid-issuer.vaultIssuerNode.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "privadoid-issuer.vaultIssuerNode.Labels" . | nindent 8 }}
-        {{- include "privadoid-issuer.vaultIssuerNode.selectorLabels" . | nindent 8 }}
+        {{- include "trustid-issuer.vaultIssuerNode.Labels" . | nindent 8 }}
+        {{- include "trustid-issuer.vaultIssuerNode.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "helpers.serviceAccountName" . }}
       containers:

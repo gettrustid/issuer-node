@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.apiIssuerNode.configMap.issuerName }}
+  name: {{ .Values.apiIssuerNode.deployment.apiconfigMapRef }}
   labels:
-    {{- include "privadoid-issuer.staticLabel" . | nindent 4 }}
-    {{- include "privadoid-issuer.labels" . | nindent 4 }}
+    {{- include "trustid-issuer.staticLabel" . | nindent 4 }}
+    {{- include "trustid-issuer.labels" . | nindent 4 }}
 data:
   ISSUER_SERVER_URL: {{ include "helpers.api-server-url" . | nindent 4 }}
   ISSUER_SERVER_PORT: {{ .Values.apiIssuerNode.configMap.issuerServerPort | quote }}

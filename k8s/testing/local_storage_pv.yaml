@@ -3,9 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: issuer-node-localstorage-pv
   labels:
-  {{- include "polygon-id-issuer.labels" . | nindent 4 }}
+  {{- include "trustid-issuer.labels" . | nindent 4 }}
 spec:
-  storageClassName: longhorn
+  storageClassName:  managed-csi
   accessModes:
     - ReadWriteOnce
   resources:

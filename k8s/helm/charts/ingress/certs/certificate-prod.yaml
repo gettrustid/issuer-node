@@ -2,13 +2,13 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: privado-id
-  namespace: issuer-node # Must be in the same namespace than ingress
+  name: trust-id
+  namespace: trustid-issuer # Must be in the same namespace than ingress
 spec:
-  secretName: wildcard-privado-id-prod-tls
+  secretName: wildcard-trustid-id-prod-tls
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: "*.privado.id"
+  commonName: "*.trustid.id"
   dnsNames:
-  - "*.privado.id"
+  - "*.trustid.id"

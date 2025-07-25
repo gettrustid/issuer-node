@@ -3,19 +3,19 @@ kind: StatefulSet
 metadata:
   name: {{ .Values.postgresIssuerNode.deployment.name }}
   labels:
-    {{- include "privadoid-issuer.postgresIssuerNode.deploymentLabels" . | nindent 4 }}
-    {{- include "privadoid-issuer.postgresIssuerNode.common.labels" . | nindent 4 }}
+    {{- include "trustid-issuer.postgresIssuerNode.deploymentLabels" . | nindent 4 }}
+    {{- include "trustid-issuer.postgresIssuerNode.common.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.postgresIssuerNode.deployment.replicaCount }}
   selector:
     matchLabels:
-      {{- include "privadoid-issuer.postgresIssuerNode.Labels" . | nindent 6 }}
-      {{- include "privadoid-issuer.postgresIssuerNode.selectorLabels" . | nindent 6 }}
+      {{- include "trustid-issuer.postgresIssuerNode.Labels" . | nindent 6 }}
+      {{- include "trustid-issuer.postgresIssuerNode.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "privadoid-issuer.postgresIssuerNode.Labels" . | nindent 8 }}
-        {{- include "privadoid-issuer.postgresIssuerNode.selectorLabels" . | nindent 8 }}
+        {{- include "trustid-issuer.postgresIssuerNode.Labels" . | nindent 8 }}
+        {{- include "trustid-issuer.postgresIssuerNode.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "helpers.serviceAccountName" . }}
       containers:

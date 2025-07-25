@@ -4,18 +4,18 @@ kind: Deployment
 metadata:
   name: {{ .Values.redisIssuerNode.deployment.name }}
   labels:
-  {{- include "privadoid-issuer.redisIssuerNode.common.labels" . | nindent 4 }}
+  {{- include "trustid-issuer.redisIssuerNode.common.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.redisIssuerNode.deployment.replicaCount }}
   selector:
     matchLabels:
-      {{- include "privadoid-issuer.redisIssuerNode.Labels" . | nindent 6 }}
-      {{- include "privadoid-issuer.redisIssuerNode.selectorLabels" . | nindent 6 }}
+      {{- include "trustid-issuer.redisIssuerNode.Labels" . | nindent 6 }}
+      {{- include "trustid-issuer.redisIssuerNode.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "privadoid-issuer.redisIssuerNode.Labels" . | nindent 8 }}
-        {{- include "privadoid-issuer.redisIssuerNode.selectorLabels" . | nindent 8 }}
+        {{- include "trustid-issuer.redisIssuerNode.Labels" . | nindent 8 }}
+        {{- include "trustid-issuer.redisIssuerNode.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "helpers.serviceAccountName" . }}
       containers:

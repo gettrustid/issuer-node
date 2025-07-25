@@ -1,9 +1,9 @@
 apiVersion: v2
-name: privadoid-issuer
+name: trustid-issuer
 description: A Helm chart for Kubernetes
 type: application
 version: 0.1.0
-appVersion: "1.16.0"
+appVersion: "1.0.0"
 
 dependencies:
   - name: vault
@@ -15,6 +15,7 @@ dependencies:
   - name: redis
     version: 0.1.0
     repository: "file://charts/redis"
-  - name: ingress
-    version: 0.1.0
-    repository: "file://charts/ingress"
+# TODO: Determine if using
+  # - name: ingress
+  #   version: 0.1.0
+  #   repository: "file://charts/ingress"

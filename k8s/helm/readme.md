@@ -28,8 +28,8 @@ To set up the app, you need to configure the following environment variables.
 The ISSUER_RESOLVER_FILE is a base64 encoded string of the resolver file. You can take a look at the resolver file [here](../../resolvers_settings_sample.yaml)
 
 ```shell
-export APP_INSTANCE_NAME=privadoid-issuernode           # Sample name for the application
-export NAMESPACE=default                                # Namespace where you want to deploy the application
+export APP_INSTANCE_NAME=trustid-issuernode           # Sample name for the application
+export NAMESPACE=identity                             # Namespace where you want to deploy the application
 export UI_DOMAIN=ui.example.com                         # Domain for the UI.
 export API_DOMAIN=api.example.com                       # Domain for the API.
 export PRIVATE_KEY='YOUR PRIVATE KEY'                   # Private key of the wallet (Ethereum private key wallet).
@@ -39,6 +39,15 @@ export ISSUERNAME="My Issuer"                           # Issuer Name. This valu
 export VAULT_PWD=password                               # Vault password to anable issuer node to connect with vault. Put the password you want to use.
 export ISSUER_RESOLVER_FILE="cG9XYZ0K+"                 # Base64 encoded string of the resolver file. You can take a look at the resolver file [here](../../resolvers_settings_sample.yaml)
 ```
+
+## Encode Resolver File
+
+* Run encode_resolver.sh, can test default included sample matches Base64 encoding above
+* Set base64 value as value for ISSUER_RESOLVER_FILE
+
+## Pre-Populate Vault
+* Use set_vault_secrets.sh , modify script as needed. This will populate the keyvault with secrets necessary for issuer
+
 
 ## Install the helm chart
 
@@ -55,3 +64,23 @@ helm install "$APP_INSTANCE_NAME" . \
 --set issuerUiInsecure=$UI_INSECURE \
 --set issuerResolverFile="$ISSUER_RESOLVER_FILE"
 ```
+
+#### Install TrustId Issuer
+
+```bash
+helm install trustid-issuer . \
+  --namespace trustid-issuer \
+  -f values.yaml
+```
+#### Upgrade
+```bash
+helm upgrade trustid-issuer . \
+  --namespace trustid-issuer \
+  -f values.yaml
+```
+helm uninstall trustid-issuer --namespace trustid-issuer
+
+## Ingress 
+* /ingress is default with cloudflare
+* switching temporarily to /ingress-nginx for testing 
+* run ingress-deploy.sh to deploy it to cluster

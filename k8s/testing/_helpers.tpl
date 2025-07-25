@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "polygon-id-issuer.name" -}}
+{{- define "trustid-issuer.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "polygon-id-issuer.fullname" -}}
+{{- define "trustid-issuer.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -33,16 +33,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "polygon-id-issuer.chart" -}}
+{{- define "trustid-issuer.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "polygon-id-issuer.labels" -}}
-helm.sh/chart: {{ include "polygon-id-issuer.chart" . }}
-{{ include "polygon-id-issuer.selectorLabels" . }}
+{{- define "trustid-issuer.labels" -}}
+helm.sh/chart: {{ include "trustid-issuer.chart" . }}
+{{ include "trustid-issuer.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -52,7 +52,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "polygon-id-issuer.selectorLabels" -}}
+{{- define "trustid-issuer.selectorLabels" -}}
 app.kubernetes.io/name: {{ .Release.Name }}
 {{- end }}
 
@@ -60,7 +60,7 @@ app.kubernetes.io/name: {{ .Release.Name }}
 {{/*
 Define a static label 
 */}}
-{{- define "polygon-id-issuer.staticLabel" -}}
+{{- define "trustid-issuer.staticLabel" -}}
 app: {{ .Values.apiIssuerNode.service.labels.app }}
 {{- end }}
 
@@ -101,28 +101,28 @@ ISSUER_KEY_STORE_ADDRESS
 {{/*
 Define custom service selectorLabels for apiIssuerNode
 */}}
-{{- define "polygon-id-issuer.apiIssuerNode.Labels" -}}
+{{- define "trustid-issuer.apiIssuerNode.Labels" -}}
 app: {{ .Values.apiIssuerNode.service.selector }}
 {{- end }}
 
 {{/*
 Define custom deployment labels fors apiIssuerNode
 */}}
-{{- define "polygon-id-issuer.apiIssuerNode.deploymentLabels" -}}
+{{- define "trustid-issuer.apiIssuerNode.deploymentLabels" -}}
 app: {{ .Values.apiIssuerNode.deployment.labels.app }}
 {{- end }}
 
 {{/*
 Define custom service selectorLabels for apiUiIssuerNode
 */}}
-{{- define "polygon-id-issuer.apiUiIssuerNode.Labels" -}}
+{{- define "trustid-issuer.apiUiIssuerNode.Labels" -}}
 app: {{ .Values.apiUiIssuerNode.service.selector }}
 {{- end }}
 
 {{/*
 Define custom deployment selectorLabels for apiUiIssuerNode
 */}}
-{{- define "polygon-id-issuer.apiUiIssuerNode.deploymentLabels" -}}
+{{- define "trustid-issuer.apiUiIssuerNode.deploymentLabels" -}}
 app: {{ .Values.apiUiIssuerNode.deployment.labels.app }}
 {{- end }}
 
@@ -130,28 +130,28 @@ app: {{ .Values.apiUiIssuerNode.deployment.labels.app }}
 {{/*
 Define custom deployment selectorLabels for notifications
 */}}
-{{- define "polygon-id-issuer.notificationsIssuerNode.Labels" -}}
+{{- define "trustid-issuer.notificationsIssuerNode.Labels" -}}
 app: {{ .Values.notificationsIssuerNode.deployment.name }}
 {{- end }}
 
 {{/*
 Define custom deployment label for notifications
 */}}
-{{- define "polygon-id-issuer.notificationsIssuerNode.deploymentLabels" -}}
+{{- define "trustid-issuer.notificationsIssuerNode.deploymentLabels" -}}
 app: {{ .Values.notificationsIssuerNode.deployment.labels.app }}
 {{- end }}
 
 {{/*
 Define custom deployment selectorLabels for pending-publisher
 */}}
-{{- define "polygon-id-issuer.pendingPublisherIssuerNode.Labels" -}}
+{{- define "trustid-issuer.pendingPublisherIssuerNode.Labels" -}}
 app: {{ .Values.pendingPublisherIssuerNode.deployment.name }}
 {{- end }}
 
 {{/*
 Define custom deployment label for pending-publisher
 */}}
-{{- define "polygon-id-issuer.pendingPublisherIssuerNode.deploymentLabels" -}}
+{{- define "trustid-issuer.pendingPublisherIssuerNode.deploymentLabels" -}}
 app: {{ .Values.pendingPublisherIssuerNode.deployment.labels.app }}
 {{- end }}
 
@@ -159,7 +159,7 @@ app: {{ .Values.pendingPublisherIssuerNode.deployment.labels.app }}
 {{/*
 Define custom service selectorLabels for UiIssuerNode
 */}}
-{{- define "polygon-id-issuer.uiIssuerNode.Labels" -}}
+{{- define "trustid-issuer.uiIssuerNode.Labels" -}}
 app: {{ .Values.uiIssuerNode.service.selector }}
 {{- end }}
 
@@ -167,14 +167,14 @@ app: {{ .Values.uiIssuerNode.service.selector }}
 {{/*
 Define custom deployment selectorLabels for UiIssuerNode
 */}}
-{{- define "polygon-id-issuer.uiIssuerNode.deploymentLabels" -}}
+{{- define "trustid-issuer.uiIssuerNode.deploymentLabels" -}}
 app: {{ .Values.uiIssuerNode.deployment.labels.app }}
 {{- end }}
 
 {{/*
 Define custom service selectorLabels for postgres
 */}}
-{{- define "polygon-id-issuer.postgresIssuerNode.Labels" -}}
+{{- define "trustid-issuer.postgresIssuerNode.Labels" -}}
 app: {{ .Values.postgresIssuerNode.service.selector }}
 {{- end }}
 
@@ -182,7 +182,7 @@ app: {{ .Values.postgresIssuerNode.service.selector }}
 {{/*
 Define custom deployment selectorLabels for postgres
 */}}
-{{- define "polygon-id-issuer.postgresIssuerNode.deploymentLabels" -}}
+{{- define "trustid-issuer.postgresIssuerNode.deploymentLabels" -}}
 app: {{ .Values.postgresIssuerNode.deployment.labels.app }}
 {{- end }}
 
@@ -190,7 +190,7 @@ app: {{ .Values.postgresIssuerNode.deployment.labels.app }}
 {{/*
 Define custom service selectorLabels for redis
 */}}
-{{- define "polygon-id-issuer.redisIssuerNode.Labels" -}}
+{{- define "trustid-issuer.redisIssuerNode.Labels" -}}
 app: {{ .Values.redisIssuerNode.service.selector }}
 {{- end }}
 
@@ -198,14 +198,14 @@ app: {{ .Values.redisIssuerNode.service.selector }}
 {{/*
 Define custom deployment selectorLabels for vault
 */}}
-{{- define "polygon-id-issuer.vaultIssuerNode.deploymentLabels" -}}
+{{- define "trustid-issuer.vaultIssuerNode.deploymentLabels" -}}
 app: {{ .Values.vaultIssuerNode.deployment.labels.app }}
 {{- end }}
 
 {{/*
 Define custom service selectorLabels for vault
 */}}
-{{- define "polygon-id-issuer.vaultIssuerNode.Labels" -}}
+{{- define "trustid-issuer.vaultIssuerNode.Labels" -}}
 app: {{ .Values.vaultIssuerNode.service.selector }}
 {{- end }}
 

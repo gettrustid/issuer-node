@@ -1,9 +1,9 @@
 {{/*
 Common labels
 */}}
-{{- define "privadoid-issuer.vaultIssuerNode.common.labels" -}}
-helm.sh/chart: {{ include "privadoid-issuer.chart" . }}
-{{ include "privadoid-issuer.vaultIssuerNode.selectorLabels" . }}
+{{- define "trustid-issuer.vaultIssuerNode.common.labels" -}}
+helm.sh/chart: {{ include "trustid-issuer.chart" . }}
+{{ include "trustid-issuer.vaultIssuerNode.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -13,22 +13,22 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Define custom deployment selectorLabels for vault
 */}}
-{{- define "privadoid-issuer.vaultIssuerNode.deploymentLabels" -}}
+{{- define "trustid-issuer.vaultIssuerNode.deploymentLabels" -}}
 app: {{ .Values.vaultIssuerNode.deployment.labels.app }}
 {{- end }}
 
 {{/*
 Define custom service selectorLabels for vault
 */}}
-{{- define "privadoid-issuer.vaultIssuerNode.Labels" -}}
+{{- define "trustid-issuer.vaultIssuerNode.Labels" -}}
 app: {{ .Values.vaultIssuerNode.service.selector }}
 {{- end }}
 
-{{- define "privadoid-issuer.vaultIssuerNode.staticLabel" -}}
+{{- define "trustid-issuer.vaultIssuerNode.staticLabel" -}}
 app: {{ .Values.vaultIssuerNode.labels.app }}
 {{- end }}
 
-{{- define "privadoid-issuer.vaultIssuerNode.selectorLabels" -}}
+{{- define "trustid-issuer.vaultIssuerNode.selectorLabels" -}}
 app.kubernetes.io/name: {{ .Release.Name }}
 {{- end }}
 

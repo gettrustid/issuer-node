@@ -3,9 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Values.postgresIssuerNode.pvc.postgres }}
   labels:
-  {{- include "privadoid-issuer.postgresIssuerNode.common.labels" . | nindent 4 }} 
+  {{- include "trustid-issuer.postgresIssuerNode.common.labels" . | nindent 4 }} 
 spec:
-  storageClassName: longhorn
+  storageClassName:  managed-csi
   accessModes:
     - ReadWriteOnce
   resources:
