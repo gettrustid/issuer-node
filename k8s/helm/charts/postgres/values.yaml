@@ -9,31 +9,42 @@ postgresIssuerNode:
       tag: '14-alpine'
     imagePullPolicy: IfNotPresent
     volumeMounts:
-    - name: postgresdata
-      mountPath: /var/lib/postgresql/data
-    - name: postgres-initdb
-      mountPath: /docker-entrypoint-initdb.d
+      - name: postgresdata
+        mountPath: /var/postgresql
+      - name: postgres-initdb
+        mountPath: /docker-entrypoint-initdb.d
+      - name: secrets-store-inline
+        mountPath: /mnt/secrets-store
+        readOnly: true
     labels: 
       app: postgres-issuer-node-deployment
-    postgresconfigMapRef: postgres-secret
     containerPort: 5432
     containerName: postgres
     volumeName: postgres-initdb
     items: init.sql
+    postgresconfigMapRef: postgres-secret
+    env:
+      - name: POSTGRES_USER_FILE
+        value: /mnt/secrets-store/ISSUER-DB-USER
+      - name: POSTGRES_PASSWORD_FILE
+        value: /mnt/secrets-store/ISSUER-DB-PASSWORD
+      - name: POSTGRES_DB_FILE
+        value: /mnt/secrets-store/ISSUER-DB-NAME
+      - name: POSTGRES_INITDB_ARGS
+        value: "-A md5"
+      - name: PGDATA
+        value: /var/postgresql/data
   service:
     name: postgres-issuer-node-svc
     ports:
-    - port: 5432
-      protocol: TCP
-      targetPort: 5432
+      - port: 5432
+        protocol: TCP
+        targetPort: 5432
     selector: postgres-issuer-node
   configMap:
     initSql: |-
       ALTER USER polygonid SUPERUSER;
-    postgresDb: platformid
-    postgresPassword: strongpasswordapp
-    postgresUser: polygonid
-    postgresName: postgres-secret  
+    postgresName: postgres-secret
   pvc:
     storageRequest: 8Gi
     volumeName: postgresdata

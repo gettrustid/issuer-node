@@ -21,25 +21,35 @@ spec:
       containers:
         - name: {{ .Values.postgresIssuerNode.deployment.containerName }}
           image: {{ .Values.postgresIssuerNode.deployment.image.repository }}:{{ .Values.postgresIssuerNode.deployment.image.tag }}
-          imagePullPolicy: {{ .Values.postgresIssuerNode.deployment.imagePullPolicy | quote}}
+          imagePullPolicy: {{ .Values.postgresIssuerNode.deployment.image.imagePullPolicy | quote }}
           ports:
-          - containerPort: {{ .Values.postgresIssuerNode.deployment.containerPort }}
-          envFrom:
-          - configMapRef:
-              name: {{ .Values.postgresIssuerNode.deployment.postgresconfigMapRef }}
-          volumeMounts: {{- toYaml .Values.postgresIssuerNode.deployment.volumeMounts | nindent 10 }}
+            - containerPort: {{ .Values.postgresIssuerNode.deployment.containerPort }}
+          volumeMounts:
+            {{- toYaml .Values.postgresIssuerNode.deployment.volumeMounts | nindent 12 }}
           env:
-          - name: PGDATA
-            value: /var/lib/postgresql/data/pgdata
+            - name: POSTGRES_USER_FILE
+              value: /mnt/secrets-store/ISSUER-DB-USER
+            - name: POSTGRES_PASSWORD_FILE
+              value: /mnt/secrets-store/ISSUER-DB-PASSWORD
+            - name: POSTGRES_DB_FILE
+              value: /mnt/secrets-store/ISSUER-DB-NAME
+            - name: POSTGRES_INITDB_ARGS
+              value: "-A md5"
+            - name: PGDATA
+              value: /var/postgresql/data
       volumes:
-      - name: {{ .Values.postgresIssuerNode.pvc.volumeName }}
-        persistentVolumeClaim:
+        - name: {{ .Values.postgresIssuerNode.pvc.volumeName }}
+          persistentVolumeClaim:
             claimName: {{ .Values.postgresIssuerNode.pvc.postgres }}
-      - name: {{ .Values.postgresIssuerNode.deployment.volumeName }}
-        configMap:
-          defaultMode: 0644
-          items:
-          - key: {{ .Values.postgresIssuerNode.deployment.items }}
-            path: {{ .Values.postgresIssuerNode.deployment.items }}
-          name: {{ .Values.postgresIssuerNode.deployment.postgresconfigMapRef }}
-        
+        - name: {{ .Values.postgresIssuerNode.deployment.volumeName }}
+          configMap:
+            name: {{ .Values.postgresIssuerNode.deployment.postgresconfigMapRef }}
+            items:
+              - key: {{ .Values.postgresIssuerNode.deployment.items }}
+                path: {{ .Values.postgresIssuerNode.deployment.items }}
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: postgres-issuer-azure-kv
