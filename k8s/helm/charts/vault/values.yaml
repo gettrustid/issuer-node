@@ -19,6 +19,9 @@ vaultIssuerNode:
       mountPath: /vault/file
     - name: vault-config
       mountPath: /vault/config
+    - name: secrets-store-inline
+      mountPath: "/mnt/secrets-store"
+      readOnly: true
     vault:
       containerSecurityContext:
         capabilities:
@@ -26,10 +29,10 @@ vaultIssuerNode:
       env:
         name1: VAULT_ADDR
         vaultAddr: http://127.0.0.1:8200
-        name2: PRIVATE_KEY
-        secretKeyRef: 
-          name: private-key-secret
-          key: private-key
+        # name2: PRIVATE_KEY
+        # secretKeyRef: 
+        #   name: azure
+        #   key: PRIVATE_KEY
       image:
         repository: hashicorp/vault
         tag: '1.14.0'
@@ -92,6 +95,7 @@ vaultIssuerNode:
       vault secrets enable -path=iden3 vault-plugin-secrets-iden3
       vault secrets enable -path=kv kv-v2
       chmod 755 /vault/file -R
+      PRIVATE_KEY=$(cat /mnt/secrets-store/PRIVATE-KEY)
       vault write iden3/import/pbkey key_type=ethereum private_key=$PRIVATE_KEY
       echo "===== ENABLED IDEN3 ====="
       export vault_token="token:${TOKEN}"

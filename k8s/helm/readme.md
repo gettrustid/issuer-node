@@ -70,7 +70,8 @@ helm install "$APP_INSTANCE_NAME" . \
 ```bash
 helm install trustid-issuer . \
   --namespace trustid-issuer \
-  -f values.yaml
+  -f values.yaml \
+  -f values.secrets.yaml
 ```
 #### Upgrade
 ```bash

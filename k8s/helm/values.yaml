@@ -1,20 +1,16 @@
 global:
-  vaultpwd: pepe
-  uidomain: ui.issuernode.polygonid.me
-  apidomain: api.issuernode.polygonid.me
+  uidomain: ui.issuernode.trustid.me
+  apidomain: api.issuernode.trustid.me
 
-issuernode_repository_image: privadoid/issuernode-api
+issuernode_repository_image: issuer.azurecr.io/issuernode-api
 issuernode_repository_tag: latest
-issuernode_ui_repository_image: privadoid/issuernode-ui
+issuernode_ui_repository_image: issuer.azurecr.io/issuernode-ui
 issuernode_ui_repository_tag: latest
-uiPassword: password
 issuerUiInsecure: false
-issuerName: "My Issuer!"
 ingressEnabled: true
-privateKey:
-namespace: issuer-node
-issuerResolverFile: ""
-
+namespace: trustid-issuer
+privateKey: ""
+vaultpwd: ""
 
 apiIssuerNode:
   deployment:
@@ -23,6 +19,7 @@ apiIssuerNode:
     env:
       issuerDatabaseUrl: postgres://$(ISSUER_DB_USER):$(ISSUER_DB_PASSWORD)@postgres-issuer-node-svc:$(ISSUER_DB_PORT)/$(ISSUER_DB_NAME)?sslmode=disable
       issuerKeyStoreAddress: http://vault-issuer-node-svc:$(ISSUER_KEY_STORE_PORT)
+      issuerApiAuthPassword: $(ISSUER_API_AUTH_PASSWORD)
     imagePullPolicy: Always
     labels:
       app: api-issuer-node-deployment
@@ -54,14 +51,12 @@ apiIssuerNode:
       app: issuer-node
 
   configMap:
-    issuerApiAuthPassword: password-issuer
     issuerApiAuthUser: user-issuer
     issuerCircuitPath: ./pkg/credentials/circuits
-    issuerDbName: platformid
-    issuerDbPassword: strongpasswordapp
+    # issuerDbName: platformid
     issuerDbPort: "5432"
-    issuerDbUser: polygonid
-    issuerKMSBJJProvider: vault
+    # issuerDbUser: polygonid
+    issuerKMSBJJProvider: metakeep
     issuerKMSETHProvider: vault
     issuerKeyStorePluginIden3MountPath: iden3
     issuerKeyStorePort: "8200"
@@ -74,12 +69,11 @@ apiIssuerNode:
     issuerRedisUrl: redis://@redis-issuer-node-svc:6379/1
     issuerReverseHashServiceEnabled: "false"
     issuerServerPort: "3001"
-    issuerName: issuer-node-api-configmap
     issuerVaultUserpassAuthEnabled: "true"
     issuerCredentialStatusPublishingKeyPath: pbkey
-    issuerIpfsGatewayUrl: https://gateway.pinata.cloud
+    issuerIpfsGatewayUrl: https://ipfs.io
     issuerKMSProviderLocalStorageFilePath: /localstoragekeys
-  
+
 notificationsIssuerNode:
   deployment:
     replicaCount: 1
@@ -133,16 +127,43 @@ uiIssuerNode:
     selector: ui-issuer-node
   configMap:
     issuerApiAuthUser: user-issuer
-    issuerApiAuthPassword: password-issuer
-    issuerApiUiIssuerName: my issuer k8s
+    issuerApiUiIssuerName: $(ISSUERNAME)
     issuerUiAuthUsername: user-ui
     issuerUiIpfsGatewayUrl: https://ipfs.io
     issuerApiUiName: issuer-node-ui-configmap
     issuerUiSchemaExplorerAndBuilderUrl: https://tools.privado.id
 
-secrets:
-  name: private-key-secret
-  type: Opaque
+vaultIssuerNode:
+  azure:
+    enabled: true
+    secretProviderClass: azure
+    secrets:
+      - objectName: PRIVATE-KEY
+        objectType: secret
+        envVar: PRIVATE_KEY
 
-
-
+azure:
+  managedIdentityClientId: ""
+  tenantId: ""
+  keyVaultName: ""      
+  secrets:
+    - name: PRIVATE-KEY
+      envVar: PRIVATE_KEY
+    - name: VAULT-PWD
+      envVar: VAULT_PWD
+    - name: UIPASSWORD
+      envVar: UIPASSWORD
+    - name: ISSUERNAME
+      envVar: ISSUERNAME
+    - name: ISSUER-RESOLVER-FILE
+      envVar: ISSUER_RESOLVER_FILE
+    - name: ISSUER-DB-USER
+      envVar: ISSUER_DB_USER
+    - name: ISSUER-DB-PASSWORD
+      envVar: ISSUER_DB_PASSWORD
+    - name: ISSUER-DB-PORT
+      envVar: ISSUER_DB_PORT
+    - name: ISSUER-DB-NAME
+      envVar: ISSUER_DB_NAME
+    - name: ISSUER-API-AUTH-PASSWORD
+      envVar: ISSUER_API_AUTH_PASSWORD

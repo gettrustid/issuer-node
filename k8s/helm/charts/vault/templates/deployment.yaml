@@ -1,4 +1,3 @@
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -28,29 +27,37 @@ spec:
           image: {{ .Values.vaultIssuerNode.deployment.vault.image.repository }}:{{ .Values.vaultIssuerNode.deployment.vault.image.tag }}
           imagePullPolicy: {{ .Values.vaultIssuerNode.deployment.vault.imagePullPolicy | quote }}
           env:
-          - name: {{ .Values.vaultIssuerNode.deployment.vault.env.name1 }}
-            value: {{ quote .Values.vaultIssuerNode.deployment.vault.env.vaultAddr }}
-          - name: {{ .Values.vaultIssuerNode.deployment.vault.env.name2 }}
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.vaultIssuerNode.deployment.vault.env.secretKeyRef.name }}
-                key: {{ .Values.vaultIssuerNode.deployment.vault.env.secretKeyRef.key }}
+            - name: {{ .Values.vaultIssuerNode.deployment.vault.env.name1 }}
+              value: {{ quote .Values.vaultIssuerNode.deployment.vault.env.vaultAddr }}
+            {{- if .Values.vaultIssuerNode.deployment.vault.env.secretKeyRef }}
+            - name: {{ .Values.vaultIssuerNode.deployment.vault.env.name2 }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vaultIssuerNode.deployment.vault.env.secretKeyRef.name }}
+                  key: {{ .Values.vaultIssuerNode.deployment.vault.env.secretKeyRef.key }}
+            {{- end }}
           ports:
             - containerPort: {{ .Values.vaultIssuerNode.deployment.containerPort }}
           command: {{ .Values.vaultIssuerNode.deployment.command }}
           volumeMounts: {{- toYaml .Values.vaultIssuerNode.deployment.volumeMounts | nindent 10 }} 
       volumes:
-      - name: {{ .Values.vaultIssuerNode.pvc.volumeName }}
-        persistentVolumeClaim:
+        - name: {{ .Values.vaultIssuerNode.pvc.volumeName }}
+          persistentVolumeClaim:
             claimName: {{ .Values.vaultIssuerNode.pvc.vault }}
-      - name: {{ .Values.vaultIssuerNode.configMap.vaultConfigName }}
-        configMap:
-          name: {{ .Values.vaultIssuerNode.configMap.vaultConfigName }}
-          defaultMode: 0500
-          items:
-          - key: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath1 }}
-            path: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath1 }}
-          - key: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath2 }}
-            path: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath2 }}
-          - key: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath3 }}
-            path: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath3 }}
+        - name: {{ .Values.vaultIssuerNode.configMap.vaultConfigName }}
+          configMap:
+            name: {{ .Values.vaultIssuerNode.configMap.vaultConfigName }}
+            defaultMode: 0500
+            items:
+              - key: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath1 }}
+                path: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath1 }}
+              - key: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath2 }}
+                path: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath2 }}
+              - key: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath3 }}
+                path: {{ .Values.vaultIssuerNode.configMap.vaultConfigPath3 }}
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: vault-issuer-azure-kv
