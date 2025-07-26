@@ -104,8 +104,9 @@ vaultIssuerNode:
       vault policy write issuernode /vault/config/policies.hcl
       echo "===== CREATE USERS ====="
       vault auth enable userpass
+      VAULT_USERPASS_PWD=$(cat /mnt/secrets-store/VAULT-PWD)
       vault write auth/userpass/users/issuernode \
-          password={{ .Values.global.vaultpwd }} \
+          password="$VAULT_USERPASS_PWD" \
           policies="issuernode"
       echo "===== TEST LOGIN ====="
       vault login -method=userpass username=issuernode password={{ .Values.global.vaultpwd }}
