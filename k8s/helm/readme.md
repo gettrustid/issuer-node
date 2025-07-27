@@ -49,21 +49,28 @@ export ISSUER_RESOLVER_FILE="cG9XYZ0K+"                 # Base64 encoded string 
 * Use set_vault_secrets.sh , modify script as needed. This will populate the keyvault with secrets necessary for issuer
 
 
-## Install the helm chart
+## App ACR Deployment 
+Script
+* Go to the project root and run `sh deploy-acr.sh`
 
+Manual
+* API - at root of project run 
 ```bash
-helm install "$APP_INSTANCE_NAME" . \
---create-namespace --namespace "$NAMESPACE" \
---set namespace="$NAMESPACE" \
---set global.uidomain="$UI_DOMAIN" \
---set global.apidomain="$API_DOMAIN" \
---set privatekey="$PRIVATE_KEY" \
---set uiPassword="$UIPASSWORD" \
---set issuerName="$ISSUERNAME" \
---set global.vaultpwd="$VAULT_PWD" \
---set issuerUiInsecure=$UI_INSECURE \
---set issuerResolverFile="$ISSUER_RESOLVER_FILE"
+docker build -t issuer.azurecr.io/issuernode-api:latest -f ./Dockerfile .
+
+docker push issuer.azurecr.io/issuernode-api:latest
 ```
+
+* UI - From within ui/ folder (separate dockerfile) run:
+```bash
+docker build -t issuer.azurecr.io/issuernode-ui:latest -f ./Dockerfile .
+
+docker push issuer.azurecr.io/issuernode-ui:latest 
+
+```
+
+
+
 
 #### Install TrustId Issuer
 

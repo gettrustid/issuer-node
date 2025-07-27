@@ -33,6 +33,7 @@ import (
 	"github.com/polygonid/sh-id-platform/internal/payments"
 	"github.com/polygonid/sh-id-platform/internal/providers"
 	"github.com/polygonid/sh-id-platform/internal/pubsub"
+	"github.com/polygonid/sh-id-platform/internal/redis"
 	"github.com/polygonid/sh-id-platform/internal/repositories"
 	"github.com/polygonid/sh-id-platform/internal/reversehash"
 	"github.com/polygonid/sh-id-platform/internal/revocationstatus"
@@ -184,8 +185,21 @@ func main() {
 
 	publisher := gateways.NewPublisher(storage, identityService, claimsService, mtService, keyStore, transactionService, proofService, publisherGateway, networkResolver, ps)
 
+	//TODO: Revert if needed to only return postgres
+	rdb, err := redis.Open(ctx, cfg.Cache.Url)
+	if err != nil {
+		log.Warn(ctx, "cannot connect to redis for health check", "err", err)
+	}
+
 	serverHealth := health.New(health.Monitors{
 		"postgres": storage.Ping,
+		"redis": func(ctx context.Context) error {
+			if rdb == nil {
+				return err
+			}
+			return redis.Status(ctx, rdb)
+		},
+		// Removed this from privado issuer:
 		//"redis": func(rdb *redis2.Client) health.Pinger {
 		//	return func(ctx context.Context) error { return rdb.Ping(ctx).Err() }
 		//}(rdb),

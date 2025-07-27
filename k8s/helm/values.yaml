@@ -65,7 +65,7 @@ apiIssuerNode:
     issuerOnchainCheckStatusFrequency: 1m
     issuerOnchainPublishStateFrequency: 1m
     issuerPublishKeyPath: pbkey
-    issuerRedisUrl: redis://@redis-issuer-node-svc:6379/1
+    issuerRedisUrl: redis://redis-issuer-node-svc:6379/1
     issuerReverseHashServiceEnabled: "false"
     issuerServerPort: "3001"
     issuerVaultUserpassAuthEnabled: "true"
