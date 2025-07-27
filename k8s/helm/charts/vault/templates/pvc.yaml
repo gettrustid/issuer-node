@@ -5,7 +5,8 @@ metadata:
   labels:
   {{- include "trustid-issuer.vaultIssuerNode.common.labels" . | nindent 4 }}
 spec:
-  storageClassName:  managed-csi
+  storageClassName:  managed-csi-retain
+  volumeName: pvc-1d211371-94e7-4dc0-893f-38ff74ae7de3  # Force bind to retained volume with data
   accessModes:
     - ReadWriteOnce
   resources:
