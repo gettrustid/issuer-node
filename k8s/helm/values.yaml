@@ -151,9 +151,9 @@ azure:
       envVar: PRIVATE_KEY
     - name: VAULT-PWD
       envVar: VAULT_PWD
-    - name: UIPASSWORD
+    - name: UI-PASSWORD
       envVar: UIPASSWORD
-    - name: ISSUERNAME
+    - name: ISSUER-NAME
       envVar: ISSUERNAME
     - name: ISSUER-RESOLVER-FILE
       envVar: ISSUER_RESOLVER_FILE
@@ -167,3 +167,9 @@ azure:
       envVar: ISSUER_DB_NAME
     - name: ISSUER-API-AUTH-PASSWORD
       envVar: ISSUER_API_AUTH_PASSWORD
+    - name: ISSUER-KEY-STORE-PORT
+      envVar: ISSUER_KEY_STORE_PORT
+    - name: METAKEEP-BJJ-APP-API-KEY
+      envVar: METAKEEP_BJJ_APP_API_KEY
+    - name: METAKEEP-BJJ-APP-API-SECRET
+      envVar: METAKEEP_BJJ_APP_API_SECRET

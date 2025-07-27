@@ -6,7 +6,7 @@ metadata:
     {{- include "trustid-issuer.notificationsIssuerNode.deploymentLabels" . | nindent 4 }}
     {{- include "trustid-issuer.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.notificationsIssuerNode.deployment.replicaCount }}
   selector:
     matchLabels:
       {{- include "trustid-issuer.notificationsIssuerNode.Labels" . | nindent 6 }}
@@ -20,17 +20,39 @@ spec:
         rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: {{ include "helpers.serviceAccountName" . }}
+
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure"
+
       containers:
         - name: {{ .Values.notificationsIssuerNode.deployment.containerName }}
           image: {{ .Values.issuernode_repository_image }}:{{ .Values.issuernode_repository_tag }}
           imagePullPolicy: {{ .Values.notificationsIssuerNode.deployment.imagePullPolicy | quote }}
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: /mnt/secrets-store
+              readOnly: true
           envFrom:
           - configMapRef:
               name: {{ .Values.apiIssuerNode.deployment.apiconfigMapRef }}
-          env:
-          - name: {{ include "helpers.issuer-db-url" .}}
-            value: {{ quote .Values.notificationsIssuerNode.deployment.env.issuerDatabaseUrl }}
-          - name: {{ include "helpers.issuer-key-store-addr" .}}
-            value: {{ quote .Values.notificationsIssuerNode.deployment.env.issuerKeyStoreAddress }}
-          args: {{ .Values.notificationsIssuerNode.deployment.args }}
-          command: {{ .Values.notificationsIssuerNode.deployment.command }}
+          command: [ "sh", "-c" ]
+          args:
+            - |
+              export METAKEEP_BJJ_APP_API_SECRET=$(cat /mnt/secrets-store/METAKEEP-BJJ-APP-API-SECRET) && \
+              export METAKEEP_BJJ_APP_API_KEY=$(cat /mnt/secrets-store/METAKEEP-BJJ-APP-API-KEY) && \
+              export ISSUER_DB_USER=$(cat /mnt/secrets-store/ISSUER-DB-USER) && \
+              export ISSUER_DB_PASSWORD=$(cat /mnt/secrets-store/ISSUER-DB-PASSWORD) && \
+              export ISSUER_DB_PORT=$(cat /mnt/secrets-store/ISSUER-DB-PORT) && \
+              export ISSUER_DB_NAME=$(cat /mnt/secrets-store/ISSUER-DB-NAME) && \
+              export ISSUER_KEY_STORE_PORT=$(cat /mnt/secrets-store/ISSUER-KEY-STORE-PORT) && \
+              export VAULT_PWD=$(cat /mnt/secrets-store/VAULT-PWD) && \
+              export ISSUER_RESOLVER_FILE=$(cat /mnt/secrets-store/ISSUER-RESOLVER-FILE) && \
+              export ISSUER_DATABASE_URL="postgres://${ISSUER_DB_USER}:${ISSUER_DB_PASSWORD}@postgres-issuer-node-svc:${ISSUER_DB_PORT}/${ISSUER_DB_NAME}?sslmode=disable" && \
+              export ISSUER_KEY_STORE_ADDRESS="http://vault-issuer-node-svc:${ISSUER_KEY_STORE_PORT}" && \
+              export ISSUER_VAULT_USERPASS_AUTH_PASSWORD="${VAULT_PWD}" && \
+              ./notifications

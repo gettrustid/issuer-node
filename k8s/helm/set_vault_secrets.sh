@@ -14,6 +14,9 @@ read -p "Enter ISSUER_DB_PASSWORD: " ISSUER_DB_PASSWORD
 read -p "Enter ISSUER_DB_PORT: " ISSUER_DB_PORT
 read -p "Enter ISSUER_DB_NAME: " ISSUER_DB_NAME
 read -p "Enter ISSUER_API_AUTH_PASSWORD: " ISSUER_API_AUTH_PASSWORD
+read -p "Enter ISSUER_KEY_STORE_PORT: " ISSUER_KEY_STORE_PORT
+read -p "Enter METAKEEP_BJJ_APP_API_KEY: " METAKEEP_BJJ_APP_API_KEY
+read -p "Enter METAKEEP_BJJ_APP_API_SECRET: " METAKEEP_BJJ_APP_API_SECRET
 
 echo "Uploading secrets to Azure Key Vault: $KEYVAULT_NAME..."
 
@@ -47,5 +50,15 @@ fi
 if [[ -n "${ISSUER_API_AUTH_PASSWORD:-}" ]]; then
     az keyvault secret set --vault-name "$KEYVAULT_NAME" --name ISSUER-API-AUTH-PASSWORD --value "$ISSUER_API_AUTH_PASSWORD"
 fi
+if [[ -n "${ISSUER_KEY_STORE_PORT:-}" ]]; then
+    az keyvault secret set --vault-name "$KEYVAULT_NAME" --name ISSUER-KEY-STORE-PORT --value "$ISSUER_KEY_STORE_PORT"
+fi
+if [[ -n "${METAKEEP_BJJ_APP_API_KEY:-}" ]]; then
+    az keyvault secret set --vault-name "$KEYVAULT_NAME" --name METAKEEP-BJJ-APP-API-KEY --value "$METAKEEP_BJJ_APP_API_KEY"
+fi
+if [[ -n "${METAKEEP_BJJ_APP_API_SECRET:-}" ]]; then
+    az keyvault secret set --vault-name "$KEYVAULT_NAME" --name METAKEEP-BJJ-APP-API-SECRET --value "$METAKEEP_BJJ_APP_API_SECRET"
+fi
+
 
 echo "All secrets uploaded successfully to Azure Key Vault: $KEYVAULT_NAME"

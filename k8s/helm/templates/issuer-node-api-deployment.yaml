@@ -40,13 +40,23 @@ spec:
           envFrom:
           - configMapRef:
               name: {{ .Values.apiIssuerNode.deployment.apiconfigMapRef }}
-          args: {{ .Values.apiIssuerNode.deployment.args }}
-          command: {{ .Values.apiIssuerNode.deployment.command }}
-          env:
-          - name: {{ include "helpers.issuer-db-url" .}}
-            value: {{ quote .Values.apiIssuerNode.deployment.env.issuerDatabaseUrl }}
-          - name: {{ include "helpers.issuer-key-store-addr" .}}
-            value: {{ quote .Values.apiIssuerNode.deployment.env.issuerKeyStoreAddress }}          
+          command: [ "sh", "-c" ]
+          args:
+            - |
+              export METAKEEP_BJJ_APP_API_SECRET=$(cat /mnt/secrets-store/METAKEEP-BJJ-APP-API-SECRET) && \
+              export METAKEEP_BJJ_APP_API_KEY=$(cat /mnt/secrets-store/METAKEEP-BJJ-APP-API-KEY) && \
+              export ISSUER_API_AUTH_PASSWORD=$(cat /mnt/secrets-store/ISSUER-API-AUTH-PASSWORD) && \
+              export ISSUER_DB_USER=$(cat /mnt/secrets-store/ISSUER-DB-USER) && \
+              export ISSUER_DB_PASSWORD=$(cat /mnt/secrets-store/ISSUER-DB-PASSWORD) && \
+              export ISSUER_DB_PORT=$(cat /mnt/secrets-store/ISSUER-DB-PORT) && \
+              export ISSUER_DB_NAME=$(cat /mnt/secrets-store/ISSUER-DB-NAME) && \
+              export ISSUER_KEY_STORE_PORT=$(cat /mnt/secrets-store/ISSUER-KEY-STORE-PORT) && \
+              export VAULT_PWD=$(cat /mnt/secrets-store/VAULT-PWD) && \
+              export ISSUER_RESOLVER_FILE=$(cat /mnt/secrets-store/ISSUER-RESOLVER-FILE) && \
+              export ISSUER_DATABASE_URL="postgres://${ISSUER_DB_USER}:${ISSUER_DB_PASSWORD}@postgres-issuer-node-svc:${ISSUER_DB_PORT}/${ISSUER_DB_NAME}?sslmode=disable" && \
+              export ISSUER_KEY_STORE_ADDRESS="http://vault-issuer-node-svc:${ISSUER_KEY_STORE_PORT}" && \
+              export ISSUER_VAULT_USERPASS_AUTH_PASSWORD="${VAULT_PWD}" && \
+              ./migrate && ./platform          
           livenessProbe:
             httpGet:
               path: {{ .Values.apiIssuerNode.deployment.livenessProbe.path }}

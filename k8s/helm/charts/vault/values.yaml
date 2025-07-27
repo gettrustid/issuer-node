@@ -109,7 +109,7 @@ vaultIssuerNode:
           password="$VAULT_USERPASS_PWD" \
           policies="issuernode"
       echo "===== TEST LOGIN ====="
-      vault login -method=userpass username=issuernode password={{ .Values.global.vaultpwd }}
+      vault login -method=userpass username=issuernode password="$VAULT_USERPASS_PWD"
       tail -f /dev/null  
     vaultJson: |-
       {                                    

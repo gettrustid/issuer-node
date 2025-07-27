@@ -79,8 +79,9 @@ helm upgrade trustid-issuer . \
   --namespace trustid-issuer \
   -f values.yaml
 ```
+```bash
 helm uninstall trustid-issuer --namespace trustid-issuer
-
+```
 ## Ingress 
 * /ingress is default with cloudflare
 * switching temporarily to /ingress-nginx for testing 
