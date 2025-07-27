@@ -70,7 +70,9 @@ app: {{ .Values.apiIssuerNode.service.labels.app }}
 Define api server url
 */}}
 {{- define "helpers.api-server-url" -}}
-https://{{ .Values.global.apidomain }}
+{{/* https://{{ .Values.global.apidomain }} */}}
+{{/* TODO: change on release */}}
+http://{{ .Values.global.apidomain }}:3001
 {{- end }}
 
 {{/*

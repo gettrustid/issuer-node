@@ -1,6 +1,8 @@
 global:
-  uidomain: ui.issuernode.trustid.me
-  apidomain: api.issuernode.trustid.me
+  # uidomain: ui.issuernode.trustid.me
+  # apidomain: api.issuernode.trustid.me
+  uidomain: ui.issuer.local
+  apidomain: api.issuer.local
 
 issuernode_repository_image: issuer.azurecr.io/issuernode-api
 issuernode_repository_tag: latest
@@ -9,9 +11,6 @@ issuernode_ui_repository_tag: latest
 issuerUiInsecure: false
 ingressEnabled: true
 namespace: trustid-issuer
-privateKey: ""
-vaultpwd: ""
-
 apiIssuerNode:
   deployment:
     replicaCount: 1
@@ -128,7 +127,7 @@ uiIssuerNode:
   configMap:
     issuerApiAuthUser: user-issuer
     issuerApiUiIssuerName: $(ISSUERNAME)
-    issuerUiAuthUsername: user-ui
+    issuerUiAuthUsername: user-ui   
     issuerUiIpfsGatewayUrl: https://ipfs.io
     issuerApiUiName: issuer-node-ui-configmap
     issuerUiSchemaExplorerAndBuilderUrl: https://tools.privado.id

@@ -20,13 +20,15 @@ spec:
         rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: {{ include "helpers.serviceAccountName" . }}
+
       volumes:
-        - name: secrets-store
+        - name: secrets-store-inline
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: "azure"
+
       containers:
         - name: {{ .Values.uiIssuerNode.deployment.containerName }}
           image: {{ .Values.issuernode_ui_repository_image }}:{{ .Values.issuernode_ui_repository_tag }}
@@ -34,9 +36,30 @@ spec:
           ports:
           - containerPort: {{ .Values.uiIssuerNode.deployment.containerPort }}
           volumeMounts:
-            - name: secrets-store
+            - name: secrets-store-inline
               mountPath: /mnt/secrets-store
               readOnly: true
           envFrom:
           - configMapRef:
               name: {{ .Values.uiIssuerNode.deployment.uiconfigMapRef }}
+          command: [ "sh", "-c" ]
+          args:
+            - |
+              export ISSUER_API_AUTH_PASSWORD=$(cat /mnt/secrets-store/ISSUER-API-AUTH-PASSWORD) && \
+              export ISSUER_NAME=$(cat /mnt/secrets-store/ISSUER-NAME) && \
+              export UIPASSWORD=$(cat /mnt/secrets-store/UI-PASSWORD) && \
+              export METAKEEP_BJJ_APP_API_SECRET=$(cat /mnt/secrets-store/METAKEEP-BJJ-APP-API-SECRET) && \
+              export METAKEEP_BJJ_APP_API_KEY=$(cat /mnt/secrets-store/METAKEEP-BJJ-APP-API-KEY) && \
+              export ISSUER_DB_USER=$(cat /mnt/secrets-store/ISSUER-DB-USER) && \
+              export ISSUER_DB_PASSWORD=$(cat /mnt/secrets-store/ISSUER-DB-PASSWORD) && \
+              export ISSUER_DB_PORT=$(cat /mnt/secrets-store/ISSUER-DB-PORT) && \
+              export ISSUER_DB_NAME=$(cat /mnt/secrets-store/ISSUER-DB-NAME) && \
+              export ISSUER_KEY_STORE_PORT=$(cat /mnt/secrets-store/ISSUER-KEY-STORE-PORT) && \
+              export VAULT_PWD=$(cat /mnt/secrets-store/VAULT-PWD) && \
+              export ISSUER_RESOLVER_FILE=$(cat /mnt/secrets-store/ISSUER-RESOLVER-FILE) && \
+              export ISSUER_DATABASE_URL="postgres://${ISSUER_DB_USER}:${ISSUER_DB_PASSWORD}@postgres-issuer-node-svc:${ISSUER_DB_PORT}/${ISSUER_DB_NAME}?sslmode=disable" && \
+              export ISSUER_KEY_STORE_ADDRESS="http://vault-issuer-node-svc:${ISSUER_KEY_STORE_PORT}" && \
+              export ISSUER_VAULT_USERPASS_AUTH_PASSWORD="${VAULT_PWD}" && \
+              export ISSUER_UI_AUTH_PASSWORD="${UIPASSWORD}" && \
+              export ISSUER_ISSUER_NAME="${ISSUER_NAME}" && \
+              exec /app/scripts/deploy.sh
