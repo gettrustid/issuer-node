@@ -6,6 +6,7 @@ metadata:
     {{- include "trustid-issuer.vaultIssuerNode.deploymentLabels" . | nindent 4 }}
     {{- include "trustid-issuer.vaultIssuerNode.common.labels" . | nindent 4 }}
 spec:
+  serviceName: {{ .Values.vaultIssuerNode.service.name }}
   replicas: {{ .Values.vaultIssuerNode.deployment.replicaCount }}
   selector:
     matchLabels:
@@ -41,9 +42,6 @@ spec:
           command: {{ .Values.vaultIssuerNode.deployment.command }}
           volumeMounts: {{- toYaml .Values.vaultIssuerNode.deployment.volumeMounts | nindent 10 }} 
       volumes:
-        - name: {{ .Values.vaultIssuerNode.pvc.volumeName }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.vaultIssuerNode.pvc.vault }}
         - name: {{ .Values.vaultIssuerNode.configMap.vaultConfigName }}
           configMap:
             name: {{ .Values.vaultIssuerNode.configMap.vaultConfigName }}
@@ -61,3 +59,15 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: vault-issuer-azure-kv
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .Values.vaultIssuerNode.pvc.volumeName }}
+        annotations:
+          "helm.sh/resource-policy": keep
+      spec:
+        storageClassName: managed-csi-retain
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.vaultIssuerNode.pvc.storageRequest }}

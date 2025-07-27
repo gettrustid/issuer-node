@@ -6,6 +6,7 @@ metadata:
     {{- include "trustid-issuer.postgresIssuerNode.deploymentLabels" . | nindent 4 }}
     {{- include "trustid-issuer.postgresIssuerNode.common.labels" . | nindent 4 }}
 spec:
+  serviceName: {{ .Values.postgresIssuerNode.service.name }}
   replicas: {{ .Values.postgresIssuerNode.deployment.replicaCount }}
   selector:
     matchLabels:
@@ -38,9 +39,6 @@ spec:
             - name: PGDATA
               value: /var/postgresql/data
       volumes:
-        - name: {{ .Values.postgresIssuerNode.pvc.volumeName }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.postgresIssuerNode.pvc.postgres }}
         - name: {{ .Values.postgresIssuerNode.deployment.volumeName }}
           configMap:
             name: {{ .Values.postgresIssuerNode.deployment.postgresconfigMapRef }}
@@ -53,3 +51,15 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: postgres-issuer-azure-kv
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .Values.postgresIssuerNode.pvc.volumeName }}
+        annotations:
+          "helm.sh/resource-policy": keep
+      spec:
+        storageClassName: managed-csi-retain
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.postgresIssuerNode.pvc.storageRequest }}
