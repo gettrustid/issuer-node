@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: issuer-node-ingress
+  namespace: trustid-issuer
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: network-nginx
+  tls:
+  - hosts:
+    - api.issuernode.trustid.int.app
+    - ui.issuernode.trustid.int.app
+    secretName: issuer-tls-cert-kv
+  rules:
+  - host: api.issuernode.trustid.int.app
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-issuer-node-svc
+            port:
+              number: 3001
+  - host: ui.issuernode.trustid.int.app
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ui-issuer-node-svc
+            port:
+              number: 8080

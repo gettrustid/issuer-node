@@ -1,0 +1,27 @@
+ingress-nginx:
+  controller:
+    ingressClassResource:
+      name: "network-nginx"
+      controllerValue: "k8s.io/network-ingress-nginx"
+    replicaCount: 1
+    nodeSelector:
+      "kubernetes.io/os": linux
+    service:
+      externalTrafficPolicy: Local
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+        service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "issuer-subnet"
+    allowSnippetAnnotations: true
+    config:
+      annotations-risk-level: "Critical"
+      ssl-redirect: "true"
+      force-ssl-redirect: "true"
+    minReadySeconds: 10
+    progressDeadlineSeconds: 600
+    admissionWebhooks:
+      patch:
+        nodeSelector:
+          "kubernetes.io/os": linux
+  defaultBackend:
+    nodeSelector:
+      "kubernetes.io/os": linux

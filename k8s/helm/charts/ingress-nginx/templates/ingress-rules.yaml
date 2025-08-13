@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: issuer-node-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: network-nginx
+  tls:
+  - hosts:
+    - {{ .Values.global.apidomain }}
+    - {{ .Values.global.uidomain }}
+    secretName: issuer-tls-cert-managed
+  rules:
+  - host: {{ .Values.global.apidomain }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-issuer-node-svc
+            port:
+              number: 3001
+  - host: {{ .Values.global.uidomain }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ui-issuer-node-svc
+            port:
+              number: 8080

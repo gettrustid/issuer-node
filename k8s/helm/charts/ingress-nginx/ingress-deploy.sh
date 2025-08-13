@@ -16,7 +16,9 @@ helm install issuer-ingress ingress-nginx/ingress-nginx \
     --set controller.admissionWebhooks.patch.nodeSelector."kubernetes\.io/os"=linux \
     --set controller.service.externalTrafficPolicy=Local \
     --set controller.allowSnippetAnnotations=true \
-    --set controller.config.annotations-risk-level=Critical 
+    --set controller.config.annotations-risk-level=Critical \
+    --set controller.config.ssl-redirect="true" \
+    --set controller.config.force-ssl-redirect="true" 
 
 echo "[3/3] Applying Route Rules"
 kubectl apply -f ./ingress-rules.yml

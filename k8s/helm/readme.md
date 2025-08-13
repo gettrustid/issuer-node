@@ -84,7 +84,8 @@ helm install trustid-issuer . \
 ```bash
 helm upgrade trustid-issuer . \
   --namespace trustid-issuer \
-  -f values.yaml
+  -f values.yaml \
+  -f values.secrets.yaml
 ```
 ```bash
 helm uninstall trustid-issuer --namespace trustid-issuer

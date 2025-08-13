@@ -1,8 +1,11 @@
 global:
-  # uidomain: ui.issuernode.trustid.me
-  # apidomain: api.issuernode.trustid.me
-  uidomain: ui.issuer.local
-  apidomain: api.issuer.local
+  #== PROD: PRIVATE DNS ==
+  uidomain: ui.issuernode.trustid.int.app 
+  apidomain: api.issuernode.trustid.int.app 
+
+  #== LOCAL: (testing with port fwd):
+  # uidomain: ui.issuer.local
+  # apidomain: api.issuer.local
 
 issuernode_repository_image: issuer.azurecr.io/issuernode-api
 issuernode_repository_tag: latest
@@ -148,6 +151,8 @@ azure:
   secrets:
     - name: PRIVATE-KEY
       envVar: PRIVATE_KEY
+    - name: trustid-tls-cert
+      envVar: TLS_CERT
     - name: VAULT-PWD
       envVar: VAULT_PWD
     - name: UI-PASSWORD
@@ -172,3 +177,11 @@ azure:
       envVar: METAKEEP_BJJ_APP_API_KEY
     - name: METAKEEP-BJJ-APP-API-SECRET
       envVar: METAKEEP_BJJ_APP_API_SECRET
+
+ingress-nginx:
+  enabled: true
+  global:
+    azure:
+      managedIdentityClientId: ""
+      tenantId: ""
+      keyVaultName: ""

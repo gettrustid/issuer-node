@@ -1,0 +1,12 @@
+dependencies:
+- name: vault
+  repository: file://charts/vault
+  version: 0.1.0
+- name: postgres
+  repository: file://charts/postgres
+  version: 0.1.0
+- name: redis
+  repository: file://charts/redis
+  version: 0.1.0
+digest: sha256:b429b8505679bd2e54906c689568f52fd51615f7020f66effe51e266f27a9220
+generated: "2025-08-12T20:44:32.22439-04:00"

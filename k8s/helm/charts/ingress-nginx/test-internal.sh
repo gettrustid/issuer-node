@@ -1,0 +1,49 @@
+#!/bin/bash
+
+echo "=== Creating test pod for internal testing ==="
+
+# Create test pod
+kubectl apply -f test-pod.yaml
+
+# Wait for pod to be ready
+echo "Waiting for test pod to be ready..."
+kubectl wait --for=condition=ready pod/test-client -n trustid-issuer --timeout=60s
+
+# Get the internal IP of the load balancer
+INTERNAL_IP=$(kubectl get svc issuer-ingress-ingress-nginx-controller -n trustid-issuer -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+echo "Internal Load Balancer IP: $INTERNAL_IP"
+
+# Check if it's actually internal (should be in private range)
+if [[ $INTERNAL_IP =~ ^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\. ]]; then
+    echo "✅ CONFIRMED: Load balancer is INTERNAL (private IP range)"
+else
+    echo "❌ WARNING: Load balancer appears to be EXTERNAL (public IP)"
+fi
+
+echo ""
+echo "=== Testing from inside the cluster ==="
+
+# Test API endpoint with Host header
+echo "Testing API endpoint..."
+kubectl exec -n trustid-issuer test-client -- curl -k -v \
+    -H "Host: api.issuernode.trustid.int.app" \
+    https://$INTERNAL_IP/status
+
+echo ""
+echo "Testing UI endpoint..."
+kubectl exec -n trustid-issuer test-client -- curl -k -I \
+    -H "Host: ui.issuernode.trustid.int.app" \
+    https://$INTERNAL_IP/
+
+echo ""
+echo "=== Certificate Information ==="
+echo "The TLS certificate is automatically attached via the ingress-rules.yml"
+echo "Certificate secret: issuer-tls-cert (self-signed, valid for *.trustid.int.app)"
+
+echo ""
+echo "=== Testing without Host header (should fail/redirect) ==="
+kubectl exec -n trustid-issuer test-client -- curl -k -I https://$INTERNAL_IP/
+
+echo ""
+echo "=== Cleanup ==="
+echo "To remove test pod: kubectl delete pod test-client -n trustid-issuer"
