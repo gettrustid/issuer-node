@@ -157,7 +157,11 @@ func NewResolver(ctx context.Context, cfg config.Configuration, kms *kms.KMS, re
 			}
 			ethereumClientsByChainID[chainID] = *resolverClientConfig
 			settings := networkSettings.RhsSettings
-			settings.Iden3CommAgentStatus = strings.TrimSuffix(cfg.ServerUrl, "/")
+			agentStatusURL := cfg.ServerUrl
+			if cfg.UniversalLinks.DeepLinkServerUrl != "" {
+				agentStatusURL = cfg.UniversalLinks.DeepLinkServerUrl
+			}
+			settings.Iden3CommAgentStatus = strings.TrimSuffix(agentStatusURL, "/")
 
 			if settings.Mode == OffChain || settings.Mode == All {
 				if settings.RhsUrl == nil {

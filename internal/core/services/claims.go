@@ -385,7 +385,13 @@ func (c *claim) GetCredentialQrCode(ctx context.Context, issID *w3c.DID, id uuid
 					ID:          claim.ID.String(),
 				},
 			},
-			URL: fmt.Sprintf(ports.AgentUrl, strings.TrimSuffix(hostURL, "/")),
+			URL: func() string {
+			agentURL := hostURL
+			if c.cfg.DeepLinkServerUrl != "" {
+				agentURL = c.cfg.DeepLinkServerUrl
+			}
+			return fmt.Sprintf(ports.AgentUrl, strings.TrimSuffix(agentURL, "/"))
+		}(),
 		},
 		From:     claim.Issuer,
 		ID:       credID.String(),
@@ -405,9 +411,15 @@ func (c *claim) GetCredentialQrCode(ctx context.Context, issID *w3c.DID, id uuid
 		log.Error(ctx, "getCredentialQrQrCode: store qr code", "err", err)
 		return nil, err
 	}
+	// Use a different URL for deeplinks if configured
+	deepLinkURL := hostURL
+	if c.cfg.DeepLinkServerUrl != "" {
+		deepLinkURL = c.cfg.DeepLinkServerUrl
+	}
+	
 	return &ports.GetCredentialQrCodeResponse{
-		DeepLink:      qrlink.NewDeepLink(hostURL, qrID, nil),
-		UniversalLink: qrlink.NewUniversal(c.cfg.BaseUrl, hostURL, qrID, nil),
+		DeepLink:      qrlink.NewDeepLink(deepLinkURL, qrID, nil),
+		UniversalLink: qrlink.NewUniversal(c.cfg.BaseUrl, deepLinkURL, qrID, nil),
 		QrRaw:         string(raw),
 		SchemaType:    getCredentialType(*claim),
 		QrID:          qrID,
@@ -827,6 +839,31 @@ func (c *claim) getAgentCredential(ctx context.Context, basicMessage *ports.Agen
 	if err != nil {
 		log.Error(ctx, "creating W3 credential", "err", err)
 		return nil, fmt.Errorf("failed to convert claim to  w3cCredential: %w", err)
+	}
+
+	// Regenerate credential status with correct deeplink URL
+	if claim.RevNonce != 0 {
+		nonce := uint64(claim.RevNonce)
+		issuerState, err := c.identitySrv.GetLatestStateByID(ctx, *basicMessage.IssuerDID)
+		if err != nil {
+			log.Error(ctx, "getting latest issuer state", "err", err)
+			return nil, fmt.Errorf("failed to get latest issuer state: %w", err)
+		}
+		
+		credentialStatusType := verifiable.Iden3commRevocationStatusV1
+		if vc.CredentialStatus != nil {
+			if existingCS, ok := vc.CredentialStatus.(verifiable.CredentialStatus); ok && existingCS.Type != "" {
+				credentialStatusType = existingCS.Type
+			}
+		}
+		
+		cs, err := c.revocationStatusResolver.GetCredentialRevocationStatus(ctx, *basicMessage.IssuerDID, nonce, *issuerState.State, credentialStatusType)
+		if err != nil {
+			log.Error(ctx, "regenerating credential status", "err", err)
+			return nil, fmt.Errorf("failed to regenerate credential status: %w", err)
+		}
+		
+		vc.CredentialStatus = cs
 	}
 
 	body, err := json.Marshal(protocol.IssuanceMessageBody{Credential: *vc})

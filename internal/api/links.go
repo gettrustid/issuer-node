@@ -30,7 +30,7 @@ func (s *Server) GetLinks(ctx context.Context, request GetLinksRequestObject) (G
 			return GetLinks400JSONResponse{N400JSONResponse{Message: "unknown request type. Allowed: all|active|inactive|exceed"}}, nil
 		}
 	}
-	links, err := s.linkService.GetAll(ctx, *issuerDID, status, request.Params.Query, s.cfg.ServerUrl)
+	links, err := s.linkService.GetAll(ctx, *issuerDID, status, request.Params.Query, s.getServerURL())
 	if err != nil {
 		log.Error(ctx, "getting links", "err", err, "req", request)
 	}
@@ -98,7 +98,7 @@ func (s *Server) CreateLinkQrCodeCallback(ctx context.Context, request CreateLin
 		return CreateLinkQrCodeCallback400JSONResponse{N400JSONResponse{Message: "invalid issuer did"}}, nil
 	}
 
-	offer, err := s.linkService.ProcessCallBack(ctx, *issuerDID, *request.Body, request.Params.LinkID, s.cfg.ServerUrl)
+	offer, err := s.linkService.ProcessCallBack(ctx, *issuerDID, *request.Body, request.Params.LinkID, s.getServerURL())
 	if err != nil {
 		log.Error(ctx, "error issuing the claim", "error", err)
 		if errors.Is(err, services.ErrLinkAlreadyExpired) || errors.Is(err, services.ErrLinkMaxExceeded) || errors.Is(err, services.ErrLinkInactive) {
@@ -154,7 +154,7 @@ func (s *Server) GetLink(ctx context.Context, request GetLinkRequestObject) (Get
 		log.Error(ctx, "parsing issuer did", "err", err, "did", request.Identifier)
 		return GetLink400JSONResponse{N400JSONResponse{Message: "invalid issuer did"}}, nil
 	}
-	link, err := s.linkService.GetByID(ctx, *issuerDID, request.Id, s.cfg.ServerUrl)
+	link, err := s.linkService.GetByID(ctx, *issuerDID, request.Id, s.getServerURL())
 	if err != nil {
 		if errors.Is(err, services.ErrLinkNotFound) {
 			return GetLink404JSONResponse{N404JSONResponse{Message: "link not found"}}, nil
@@ -189,7 +189,7 @@ func (s *Server) CreateLinkOffer(ctx context.Context, req CreateLinkOfferRequest
 		log.Error(ctx, "parsing issuer did", "err", err, "did", req.Identifier)
 		return CreateLinkOffer400JSONResponse{N400JSONResponse{Message: "invalid issuer did"}}, nil
 	}
-	createLinkQrCodeResponse, err := s.linkService.CreateQRCode(ctx, *issuerDID, req.Id, s.cfg.ServerUrl)
+	createLinkQrCodeResponse, err := s.linkService.CreateQRCode(ctx, *issuerDID, req.Id, s.getServerURL())
 	if err != nil {
 		if errors.Is(err, services.ErrLinkNotFound) {
 			return CreateLinkOffer404JSONResponse{N404JSONResponse{Message: "error: link not found"}}, nil

@@ -75,6 +75,7 @@ apiIssuerNode:
     issuerCredentialStatusPublishingKeyPath: pbkey
     issuerIpfsGatewayUrl: https://ipfs.io
     issuerKMSProviderLocalStorageFilePath: /localstoragekeys
+    issuerDeepLinkServerUrl: "https://api.trustid.life/api"
 
 notificationsIssuerNode:
   deployment:

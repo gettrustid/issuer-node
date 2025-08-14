@@ -321,7 +321,7 @@ func (s *Server) GetCredentialOffer(ctx context.Context, request GetCredentialOf
 		return GetCredentialOffer400JSONResponse{N400JSONResponse{"invalid claim id"}}, nil
 	}
 
-	resp, err := s.claimService.GetCredentialQrCode(ctx, did, claimID, s.cfg.ServerUrl)
+	resp, err := s.claimService.GetCredentialQrCode(ctx, did, claimID, s.getServerURL())
 	if err != nil {
 		if errors.Is(err, services.ErrCredentialNotFound) {
 			return GetCredentialOffer404JSONResponse{N404JSONResponse{"QrCode not found"}}, nil

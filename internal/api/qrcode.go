@@ -28,7 +28,7 @@ func (s *Server) GetQrFromStore(ctx context.Context, request GetQrFromStoreReque
 			return GetQrFromStore400JSONResponse{N400JSONResponse{"invalid issuer did"}}, nil
 		}
 
-		link, err := s.linkService.GetByID(ctx, *issuerDID, *request.Params.Id, s.cfg.ServerUrl)
+		link, err := s.linkService.GetByID(ctx, *issuerDID, *request.Params.Id, s.getServerURL())
 		if err != nil {
 			log.Error(ctx, "getting link by id", "err", err, "link id", *request.Params.Id)
 			return GetQrFromStore404JSONResponse{N404JSONResponse{"link not found"}}, nil

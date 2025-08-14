@@ -27,6 +27,7 @@ import (
 	"github.com/jackc/pgx/v4"
 
 	"github.com/polygonid/sh-id-platform/internal/common"
+	"github.com/polygonid/sh-id-platform/internal/config"
 	"github.com/polygonid/sh-id-platform/internal/core/domain"
 	"github.com/polygonid/sh-id-platform/internal/core/event"
 	"github.com/polygonid/sh-id-platform/internal/core/ports"
@@ -96,11 +97,12 @@ type identity struct {
 	networkResolver          network.Resolver
 	rhsFactory               reversehash.Factory
 	keyRepository            ports.KeyRepository
+	cfg                      config.UniversalLinks
 }
 
 // NewIdentity creates a new identity
 // nolint
-func NewIdentity(kms kms.KMSType, identityRepository ports.IdentityRepository, imtRepository ports.IdentityMerkleTreeRepository, identityStateRepository ports.IdentityStateRepository, mtservice ports.MtService, qrService ports.QrStoreService, claimsRepository ports.ClaimRepository, revocationRepository ports.RevocationRepository, connectionsRepository ports.ConnectionRepository, storage *db.Storage, verifier *auth.Verifier, sessionRepository ports.SessionRepository, ps pubsub.Client, networkResolver network.Resolver, rhsFactory reversehash.Factory, revocationStatusResolver *revocationstatus.Resolver, keyRepository ports.KeyRepository) ports.IdentityService {
+func NewIdentity(kms kms.KMSType, identityRepository ports.IdentityRepository, imtRepository ports.IdentityMerkleTreeRepository, identityStateRepository ports.IdentityStateRepository, mtservice ports.MtService, qrService ports.QrStoreService, claimsRepository ports.ClaimRepository, revocationRepository ports.RevocationRepository, connectionsRepository ports.ConnectionRepository, storage *db.Storage, verifier *auth.Verifier, sessionRepository ports.SessionRepository, ps pubsub.Client, networkResolver network.Resolver, rhsFactory reversehash.Factory, revocationStatusResolver *revocationstatus.Resolver, keyRepository ports.KeyRepository, cfg config.UniversalLinks) ports.IdentityService {
 	return &identity{
 		identityRepository:       identityRepository,
 		imtRepository:            imtRepository,
@@ -120,6 +122,7 @@ func NewIdentity(kms kms.KMSType, identityRepository ports.IdentityRepository, i
 		rhsFactory:               rhsFactory,
 		revocationStatusResolver: revocationStatusResolver,
 		keyRepository:            keyRepository,
+		cfg:                      cfg,
 	}
 }
 
@@ -471,7 +474,12 @@ func (i *identity) AuthenticateWithRequest(ctx context.Context, sessionID *uuid.
 		return nil, err
 	}
 
-	issuerDoc := newDIDDocument(serverURL, *issuerDID)
+	// Use a different URL for DID document service endpoint if configured
+	didServiceURL := serverURL
+	if i.cfg.DeepLinkServerUrl != "" {
+		didServiceURL = i.cfg.DeepLinkServerUrl
+	}
+	issuerDoc := newDIDDocument(didServiceURL, *issuerDID)
 	bytesIssuerDoc, err := json.Marshal(issuerDoc)
 	if err != nil {
 		log.Error(ctx, "failed to marshal issuerDoc", "err", err)
@@ -538,7 +546,13 @@ func (i *identity) CreateAuthenticationQRCode(ctx context.Context, serverURL str
 		Typ:      packers.MediaTypePlainMessage,
 		Type:     protocol.AuthorizationRequestMessageType,
 		Body: protocol.AuthorizationRequestMessageBody{
-			CallbackURL: fmt.Sprintf(ports.AuthorizationRequestQRCallbackURL, serverURL, sessionID),
+			CallbackURL: func() string {
+				callbackURL := serverURL
+				if i.cfg.DeepLinkServerUrl != "" {
+					callbackURL = i.cfg.DeepLinkServerUrl
+				}
+				return fmt.Sprintf(ports.AuthorizationRequestQRCallbackURL, callbackURL, sessionID)
+			}(),
 			Reason:      authReason,
 			Scope:       make([]protocol.ZeroKnowledgeProofRequest, 0),
 		},
@@ -555,8 +569,13 @@ func (i *identity) CreateAuthenticationQRCode(ctx context.Context, serverURL str
 	if err != nil {
 		return nil, err
 	}
+	
+	// Note: For authentication QR codes, we use the same URL as serverURL
+	// This could be enhanced to use a different URL if needed in the future
+	deepLinkURL := serverURL
+	
 	return &ports.CreateAuthenticationQRCodeResponse{
-		QRCodeURL: qrlink.NewDeepLink(serverURL, linkID, nil),
+		QRCodeURL: qrlink.NewDeepLink(deepLinkURL, linkID, nil),
 		SessionID: sessionID,
 		QrID:      linkID,
 	}, nil

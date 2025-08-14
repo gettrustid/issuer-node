@@ -193,7 +193,8 @@ type MediaTypeManager struct {
 
 // UniversalLinks configuration
 type UniversalLinks struct {
-	BaseUrl string `env:"ISSUER_UNIVERSAL_LINKS_BASE_URL" envDefault:"https://wallet.privado.id"`
+	BaseUrl           string `env:"ISSUER_UNIVERSAL_LINKS_BASE_URL" envDefault:"https://wallet.privado.id"`
+	DeepLinkServerUrl string `env:"ISSUER_DEEPLINK_SERVER_URL"`
 }
 
 // Load loads the configuration from a file

@@ -57,6 +57,14 @@ func NewServer(cfg *config.Configuration, identityService ports.IdentityService,
 	}
 }
 
+// getServerURL returns the deep link server URL if configured, otherwise the regular server URL
+func (s *Server) getServerURL() string {
+	if s.cfg.UniversalLinks.DeepLinkServerUrl != "" {
+		return s.cfg.UniversalLinks.DeepLinkServerUrl
+	}
+	return s.cfg.ServerUrl
+}
+
 // Health is a method
 func (s *Server) Health(_ context.Context, _ HealthRequestObject) (HealthResponseObject, error) {
 	var resp Health200JSONResponse = s.health.Status()

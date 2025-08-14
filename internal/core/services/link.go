@@ -159,7 +159,13 @@ func (ls *Link) GetByID(ctx context.Context, issuerDID w3c.DID, id uuid.UUID, se
 			Typ:      packers.MediaTypePlainMessage,
 			Type:     protocol.AuthorizationRequestMessageType,
 			Body: protocol.AuthorizationRequestMessageBody{
-				CallbackURL: fmt.Sprintf(ports.LinksCallbackURL, serverURL, issuerDID.String(), link.ID.String()),
+				CallbackURL: func() string {
+					callbackURL := serverURL
+					if ls.cfg.DeepLinkServerUrl != "" {
+						callbackURL = ls.cfg.DeepLinkServerUrl
+					}
+					return fmt.Sprintf(ports.LinksCallbackURL, callbackURL, issuerDID.String(), link.ID.String())
+				}(),
 				Reason:      authReason,
 				Scope:       make([]protocol.ZeroKnowledgeProofRequest, 0),
 			},
@@ -196,8 +202,13 @@ func (ls *Link) GetAll(ctx context.Context, issuerDID w3c.DID, status ports.Link
 
 func (ls *Link) addLinksToLink(link *domain.Link, serverURL string, issuerDID w3c.DID) {
 	if link.AuthorizationRequestMessage != nil {
-		link.DeepLink = qrlink.NewDeepLink(serverURL, link.ID, &issuerDID)
-		link.UniversalLink = qrlink.NewUniversal(ls.cfg.BaseUrl, serverURL, link.ID, &issuerDID)
+		// Use a different URL for deeplinks if configured
+		deepLinkURL := serverURL
+		if ls.cfg.DeepLinkServerUrl != "" {
+			deepLinkURL = ls.cfg.DeepLinkServerUrl
+		}
+		link.DeepLink = qrlink.NewDeepLink(deepLinkURL, link.ID, &issuerDID)
+		link.UniversalLink = qrlink.NewUniversal(ls.cfg.BaseUrl, deepLinkURL, link.ID, &issuerDID)
 	}
 }
 
@@ -226,9 +237,16 @@ func (ls *Link) CreateQRCode(ctx context.Context, issuerDID w3c.DID, linkID uuid
 		return nil, err
 	}
 	raw = link.AuthorizationRequestMessage.Bytes
+	
+	// Use a different URL for deeplinks if configured
+	deepLinkURL := serverURL
+	if ls.cfg.DeepLinkServerUrl != "" {
+		deepLinkURL = ls.cfg.DeepLinkServerUrl
+	}
+	
 	return &ports.CreateQRCodeResponse{
-		DeepLink:      qrlink.NewDeepLink(serverURL, linkID, &issuerDID),
-		UniversalLink: qrlink.NewUniversal(ls.cfg.BaseUrl, serverURL, link.ID, &issuerDID),
+		DeepLink:      qrlink.NewDeepLink(deepLinkURL, linkID, &issuerDID),
+		UniversalLink: qrlink.NewUniversal(ls.cfg.BaseUrl, deepLinkURL, link.ID, &issuerDID),
 		QrID:          link.ID,
 		Link:          link,
 		QrCodeRaw:     string(raw),
@@ -321,12 +339,16 @@ func (ls *Link) IssueOrFetchClaim(ctx context.Context, issuerDID w3c.DID, userDI
 	}
 
 	credentialIssued.ID = credentialIssuedID
+	agentURL := hostURL
+	if ls.cfg.DeepLinkServerUrl != "" {
+		agentURL = ls.cfg.DeepLinkServerUrl
+	}
 	if link.CredentialSignatureProof {
-		credOffer, err := notifications.NewOfferMsg(fmt.Sprintf(ports.AgentUrl, hostURL), credentialIssued)
+		credOffer, err := notifications.NewOfferMsg(fmt.Sprintf(ports.AgentUrl, agentURL), credentialIssued)
 		return credOffer, err
 	} else {
 		if credentialIssued.MTPProof.Bytes != nil {
-			credOffer, err := notifications.NewOfferMsg(fmt.Sprintf(ports.AgentUrl, hostURL), credentialIssued)
+			credOffer, err := notifications.NewOfferMsg(fmt.Sprintf(ports.AgentUrl, agentURL), credentialIssued)
 			return credOffer, err
 		}
 		log.Info(ctx, "credential issued without MTP proof. Publishing state have to be done", "credential", credentialIssued.ID.String())

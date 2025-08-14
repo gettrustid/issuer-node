@@ -62,7 +62,7 @@ func (s *Server) CreateIdentity(ctx context.Context, request CreateIdentityReque
 		return CreateIdentity400JSONResponse{N400JSONResponse{Message: fmt.Sprintf("Credential Status Type '%s' is not supported by the issuer", *credentialStatusType)}}, nil
 	}
 
-	identity, err := s.identityService.Create(ctx, s.cfg.ServerUrl, &ports.DIDCreationOptions{
+	identity, err := s.identityService.Create(ctx, s.getServerURL(), &ports.DIDCreationOptions{
 		Method:               core.DIDMethod(method),
 		Network:              core.NetworkID(network),
 		Blockchain:           core.Blockchain(blockchain),
