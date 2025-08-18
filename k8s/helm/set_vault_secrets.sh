@@ -3,8 +3,8 @@
 set -euo pipefail
 
 KEYVAULT_NAME="issuer-kv"
-ISSUER_RESOLVER_FILE="" # enter in manually but don't check in the value
 
+ISSUER_RESOLVER_FILE="" # enter in manually but don't check in the value
 read -p "Enter VAULT_PWD: " VAULT_PWD
 read -p "Enter UIPASSWORD: " UIPASSWORD
 read -p "Enter ISSUERNAME: " ISSUERNAME
@@ -17,6 +17,7 @@ read -p "Enter ISSUER_API_AUTH_PASSWORD: " ISSUER_API_AUTH_PASSWORD
 read -p "Enter ISSUER_KEY_STORE_PORT: " ISSUER_KEY_STORE_PORT
 read -p "Enter METAKEEP_BJJ_APP_API_KEY: " METAKEEP_BJJ_APP_API_KEY
 read -p "Enter METAKEEP_BJJ_APP_API_SECRET: " METAKEEP_BJJ_APP_API_SECRET
+read -p "Enter path to ETH RPC TLS certificate file: " ETH_RPC_TLS_CERT_FILE
 
 echo "Uploading secrets to Azure Key Vault: $KEYVAULT_NAME..."
 
@@ -58,6 +59,9 @@ if [[ -n "${METAKEEP_BJJ_APP_API_KEY:-}" ]]; then
 fi
 if [[ -n "${METAKEEP_BJJ_APP_API_SECRET:-}" ]]; then
     az keyvault secret set --vault-name "$KEYVAULT_NAME" --name METAKEEP-BJJ-APP-API-SECRET --value "$METAKEEP_BJJ_APP_API_SECRET"
+fi
+if [[ -n "${ETH_RPC_TLS_CERT_FILE:-}" ]] && [[ -f "${ETH_RPC_TLS_CERT_FILE}" ]]; then
+    az keyvault secret set --vault-name "$KEYVAULT_NAME" --name eth-rpc-ca-bundle --file "$ETH_RPC_TLS_CERT_FILE"
 fi
 
 

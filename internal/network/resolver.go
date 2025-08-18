@@ -2,16 +2,21 @@ package network
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"io"
 	"math/big"
+	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/iden3/contracts-abi/state/go/abi"
 	"github.com/iden3/go-iden3-auth/v2/pubsignals"
 	"github.com/iden3/go-iden3-auth/v2/state"
@@ -125,7 +130,7 @@ func NewResolver(ctx context.Context, cfg config.Configuration, kms *kms.KMS, re
 				}
 			}
 			resolverPrefixKey := getResolverPrefixKey(chainName, networkName)
-			ethClient, err := ethclient.Dial(networkSettings.NetworkURL)
+			ethClient, err := createEthClientWithTLS(ctx, networkSettings.NetworkURL)
 			if err != nil {
 				log.Error(ctx, "cannot connect to ethereum network", "err", err, "networkURL", networkSettings.NetworkURL)
 				return nil, err
@@ -345,4 +350,46 @@ func registerCustomDIDMethod(ctx context.Context, blockchain string, network str
 	}
 	log.Info(ctx, "custom DID method registered", "customDID", chainID)
 	return nil
+}
+
+func createEthClientWithTLS(ctx context.Context, networkURL string) (*ethclient.Client, error) {
+
+	certPath := "/mnt/secrets-store/eth-rpc-ca-bundle"
+	var httpClient *http.Client
+
+	if _, err := os.Stat(certPath); err == nil {
+		cert, err := os.ReadFile(certPath)
+		if err != nil {
+			log.Error(ctx, "failed to read TLS certificate from vault", "err", err, "path", certPath)
+			return nil, fmt.Errorf("failed to read TLS certificate: %v", err)
+		}
+
+		caCertPool := x509.NewCertPool()
+		if !caCertPool.AppendCertsFromPEM(cert) {
+			return nil, fmt.Errorf("failed to parse TLS certificate")
+		}
+
+		tlsConfig := &tls.Config{
+			RootCAs: caCertPool,
+		}
+
+		httpClient = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: tlsConfig,
+			},
+		}
+
+		log.Info(ctx, "using custom TLS certificate for Ethereum RPC", "networkURL", networkURL)
+	} else {
+		httpClient = http.DefaultClient
+		log.Debug(ctx, "no custom TLS certificate found, using default client", "networkURL", networkURL)
+	}
+
+	// Create RPC client with custom HTTP client using newer API
+	rpcClient, err := rpc.DialOptions(context.Background(), networkURL, rpc.WithHTTPClient(httpClient))
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to RPC endpoint: %v", err)
+	}
+
+	return ethclient.NewClient(rpcClient), nil
 }
