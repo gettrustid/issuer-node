@@ -35,3 +35,5 @@ kms_localstorage_keys.json
 # vendor/
 
 .DS_STORE
+
+values.secrets.yaml
