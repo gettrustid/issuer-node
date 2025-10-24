@@ -27,12 +27,6 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: "azure"
-        - name: tls-secrets-store
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: "issuer-kv-tls"
       containers:
         - name: {{ .Values.apiIssuerNode.deployment.containerName }}
           image: {{ .Values.issuernode_repository_image }}:{{ .Values.issuernode_repository_tag }}
@@ -42,9 +36,6 @@ spec:
           volumeMounts:
             - name: secrets-store
               mountPath: /mnt/secrets-store
-              readOnly: true
-            - name: tls-secrets-store
-              mountPath: /mnt/tls-secrets-store
               readOnly: true
           envFrom:
           - configMapRef:

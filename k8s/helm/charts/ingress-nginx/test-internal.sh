@@ -26,7 +26,7 @@ echo "=== Testing from inside the cluster ==="
 # Test API endpoint with Host header
 echo "Testing API endpoint..."
 kubectl exec -n trustid-issuer test-client -- curl -k -v \
-    -H "Host: api.issuernode.trustid.int.app" \
+    -H "Host: api.issuernode.internal.trustid.life" \
     https://$INTERNAL_IP/status
 
 echo ""

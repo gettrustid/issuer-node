@@ -10,11 +10,11 @@ spec:
   ingressClassName: network-nginx
   tls:
   - hosts:
-    - api.issuernode.trustid.int.app
-    - ui.issuernode.trustid.int.app
+    - api.issuernode.internal.trustid.life
+    - ui.issuernode.internal.trustid.life
     secretName: issuer-tls-cert-kv
   rules:
-  - host: api.issuernode.trustid.int.app
+  - host: api.issuernode.internal.trustid.life
     http:
       paths:
       - path: /

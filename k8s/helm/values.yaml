@@ -1,7 +1,7 @@
 global:
   #== PROD: PRIVATE DNS ==
-  uidomain: ui.issuernode.trustid.int.app 
-  apidomain: api.issuernode.trustid.int.app 
+  uidomain: ui-issuer.internal.trustid.life
+  apidomain: api-issuer.internal.trustid.life 
 
   #== LOCAL: (testing with port fwd):
   # uidomain: ui.issuer.local
@@ -148,12 +148,10 @@ vaultIssuerNode:
 azure:
   managedIdentityClientId: ""
   tenantId: ""
-  keyVaultName: ""      
+  keyVaultName: ""
   secrets:
     - name: PRIVATE-KEY
       envVar: PRIVATE_KEY
-    - name: trustid-tls-cert
-      envVar: TLS_CERT
     - name: VAULT-PWD
       envVar: VAULT_PWD
     - name: UI-PASSWORD

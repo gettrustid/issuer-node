@@ -6,13 +6,14 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "le-prod-acmedns"
 spec:
   ingressClassName: network-nginx
   tls:
   - hosts:
     - {{ .Values.global.apidomain }}
     - {{ .Values.global.uidomain }}
-    secretName: issuer-tls-cert-managed
+    secretName: internal-wildcard-tls
   rules:
   - host: {{ .Values.global.apidomain }}
     http:

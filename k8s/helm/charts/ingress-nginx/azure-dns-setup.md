@@ -52,12 +52,12 @@ From a VM or machine within your VNet:
 
 ```bash
 # Test DNS resolution
-nslookup api.issuernode.trustid.int.app
-nslookup ui.issuernode.trustid.int.app
+nslookup api.issuernode.internal.trustid.life
+nslookup ui.issuernode.internal.trustid.life
 
 # Test HTTPS access
-curl -k https://api.issuernode.trustid.int.app/status
-curl -k https://ui.issuernode.trustid.int.app
+curl -k https://api.issuernode.internal.trustid.life/status
+curl -k https://ui.issuernode.internal.trustid.life
 ```
 
 ## 5. Add Certificate to Trust Store (Optional)

@@ -1,0 +1,16 @@
+{
+  "*.internal.trustid.life": {
+    "username": "your-acmedns-username",
+    "password": "your-acmedns-password",
+    "fulldomain": "your-subdomain.auth.trustid.life",
+    "subdomain": "your-subdomain",
+    "allowfrom": []
+  },
+  "internal.trustid.life": {
+    "username": "your-acmedns-username",
+    "password": "your-acmedns-password",
+    "fulldomain": "your-subdomain.auth.trustid.life",
+    "subdomain": "your-subdomain",
+    "allowfrom": []
+  }
+}

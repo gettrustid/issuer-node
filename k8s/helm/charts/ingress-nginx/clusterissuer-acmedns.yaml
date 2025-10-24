@@ -1,0 +1,22 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: le-prod-acmedns
+spec:
+  acme:
+    email: mona@tracerlabs.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: le-prod-account-key
+    solvers:
+      - selector:
+          dnsZones:
+            - internal.trustid.life
+            - external.trustid.life
+            - trustid.life
+        dns01:
+          acmeDNS:
+            host: http://20.157.88.74
+            accountSecretRef:
+              name: acmedns-credentials
+              key: acmedns.json
