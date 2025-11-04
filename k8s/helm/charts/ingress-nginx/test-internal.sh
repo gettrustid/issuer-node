@@ -2,8 +2,11 @@
 
 echo "=== Creating test pod for internal testing ==="
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Create test pod
-kubectl apply -f test-pod.yaml
+kubectl apply -f "$SCRIPT_DIR/test-pod.yaml"
 
 # Wait for pod to be ready
 echo "Waiting for test pod to be ready..."
@@ -26,19 +29,19 @@ echo "=== Testing from inside the cluster ==="
 # Test API endpoint with Host header
 echo "Testing API endpoint..."
 kubectl exec -n trustid-issuer test-client -- curl -k -v \
-    -H "Host: api.issuernode.internal.trustid.life" \
+    -H "Host: api-issuer.internal.trustid.life" \
     https://$INTERNAL_IP/status
 
 echo ""
 echo "Testing UI endpoint..."
 kubectl exec -n trustid-issuer test-client -- curl -k -I \
-    -H "Host: ui.issuernode.trustid.int.app" \
+    -H "Host: ui-issuer.internal.trustid.life" \
     https://$INTERNAL_IP/
 
 echo ""
 echo "=== Certificate Information ==="
-echo "The TLS certificate is automatically attached via the ingress-rules.yml"
-echo "Certificate secret: issuer-tls-cert (self-signed, valid for *.trustid.int.app)"
+echo "The TLS certificate is automatically attached via the ingress-rules.yaml"
+echo "Certificate secret: internal-wildcard-tls (Let's Encrypt, valid for *.internal.trustid.life)"
 
 echo ""
 echo "=== Testing without Host header (should fail/redirect) ==="

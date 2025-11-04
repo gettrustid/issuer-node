@@ -91,6 +91,69 @@ helm upgrade trustid-issuer . \
 helm uninstall trustid-issuer --namespace trustid-issuer
 ```
 ## Ingress 
-* /ingress is default with cloudflare
-* switching temporarily to /ingress-nginx for testing 
+* /ingress is default with cloudflare since the original stack was public 
+* using /ingress-nginx instead
 * run ingress-deploy.sh to deploy it to cluster
+
+## Acme DNS - SSL
+* We have an acme dns server running on our primary cluster prod_apps (20.157.88.74)
+* This cluster will point to that server for DNS-01 challenges and cert management
+* We use a **wildcard certificate** (`*.internal.trustid.life`) to cover all subdomains
+
+### Setup Instructions
+
+1. **Create your acmedns.json from the sample:**
+   ```bash
+   cp k8s/helm/charts/ingress-nginx/acmedns.json.sample k8s/helm/charts/ingress-nginx/acmedns.json
+   ```
+
+2. **Fill in credentials** - Get these from your primary cluster's ACME DNS server
+   - You only need entries for `*.internal.trustid.life` and `internal.trustid.life`
+   - No need to add specific subdomains if using the wildcard certificate approach
+
+3. **Create the Kubernetes secret:**
+   ```bash
+   kubectl create secret generic acmedns-credentials \
+     --from-file=k8s/helm/charts/ingress-nginx/acmedns.json \
+     --namespace=cert-manager \
+     --dry-run=client -o yaml | kubectl apply -f -
+   ```
+
+### Key Configuration Files
+
+- **ClusterIssuer:** `k8s/helm/charts/ingress-nginx/clusterissuer-acmedns.yaml` - Points to ACME DNS at 20.157.88.74
+- **Wildcard Cert:** `k8s/helm/charts/ingress-nginx/certificate-wildcard-internal.yaml` - Creates `*.internal.trustid.life` cert
+- **Ingress Rules:** `k8s/helm/charts/ingress-nginx/templates/ingress-rules.yaml` - **NOTE:** The `cert-manager.io/cluster-issuer` annotation should be commented out to use the standalone wildcard certificate
+
+### Updating ACME DNS Credentials
+
+If you need to update the acmedns.json (e.g., for a new cluster):
+
+```bash
+# 1. Update the secret
+kubectl create secret generic acmedns-credentials \
+  --from-file=k8s/helm/charts/ingress-nginx/acmedns.json \
+  --namespace=cert-manager \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# 2. Restart cert-manager to pick up new credentials
+kubectl rollout restart deployment cert-manager -n cert-manager
+
+# 3. Force certificate renewal
+kubectl delete certificate internal-wildcard-tls -n trustid-issuer
+kubectl apply -f k8s/helm/charts/ingress-nginx/certificate-wildcard-internal.yaml
+
+# 4. Watch certificate status (should be Ready in 1-5 minutes)
+kubectl get certificate internal-wildcard-tls -n trustid-issuer -w
+```
+
+### Troubleshooting
+
+- Check certificate status: `kubectl describe certificate internal-wildcard-tls -n trustid-issuer`
+- Check challenges: `kubectl get challenges -n trustid-issuer`
+- Check cert-manager logs: `kubectl logs -n cert-manager -l app=cert-manager --tail=50`
+- Verify secret exists: `kubectl get secret internal-wildcard-tls -n trustid-issuer`
+
+
+- Create simple curl pod `kubectl run curl-test --image=curlimages/curl:latest -it --rm -- /bin/sh`
+- send curl request in pod to test `curl -k https://api-issuer.internal.trustid.life/status`
