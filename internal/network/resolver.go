@@ -352,6 +352,7 @@ func registerCustomDIDMethod(ctx context.Context, blockchain string, network str
 	return nil
 }
 
+// TODO: Revise or Remove later - No longer in use at the moment
 func createEthClientWithTLS(ctx context.Context, networkURL string) (*ethclient.Client, error) {
 
 	certPath := "/mnt/secrets-store/eth-rpc-ca-bundle"

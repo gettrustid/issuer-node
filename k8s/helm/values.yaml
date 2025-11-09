@@ -75,7 +75,8 @@ apiIssuerNode:
     issuerCredentialStatusPublishingKeyPath: pbkey
     issuerIpfsGatewayUrl: https://ipfs.io
     issuerKMSProviderLocalStorageFilePath: /localstoragekeys
-    issuerDeepLinkServerUrl: "https://api.trustid.life/api"
+    # issuerDeepLinkServerUrl: "https://api.trustid.life/api" #TODO: REVER POST DEV TESTING
+    issuerDeepLinkServerUrl: "https://dev.trustid.life/api"
 
 notificationsIssuerNode:
   deployment:
@@ -176,8 +177,6 @@ azure:
       envVar: METAKEEP_BJJ_APP_API_KEY
     - name: METAKEEP-BJJ-APP-API-SECRET
       envVar: METAKEEP_BJJ_APP_API_SECRET
-    - name: eth-rpc-ca-bundle
-      envVar: ETH_RPC_TLS_CERT
 
 ingress-nginx:
   enabled: true
