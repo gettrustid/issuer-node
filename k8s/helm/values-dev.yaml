@@ -1,0 +1,51 @@
+# Dev environment configuration for trustid-issuer-dev namespace
+# Deploy with: helm upgrade --install issuer-node-dev . -f values.yaml -f values-dev.yaml -f values.secrets-dev.yaml -n trustid-issuer-dev --create-namespace
+
+global:
+  # Dev-internal domain for internal-only services
+  uidomain: ui-issuer.dev-internal.trustid.life
+  apidomain: api-issuer.dev-internal.trustid.life
+
+# Override namespace for dev
+namespace: trustid-issuer-dev
+
+# Skip StorageClass creation (already exists from prod deployment)
+skipStorageClass: true
+
+# Dev-specific API configuration
+apiIssuerNode:
+  configMap:
+    # Debug logging for dev environment
+    issuerLogLevel: "-4"
+    # Dev deep link server
+    issuerDeepLinkServerUrl: "https://dev.trustid.life/api"
+  deployment:
+    labels:
+      app: api-issuer-node-deployment
+      environment: dev
+
+# Dev-specific UI configuration
+uiIssuerNode:
+  deployment:
+    labels:
+      app: ui-issuer-node-deployment
+      environment: dev
+
+# Dev-specific notifications configuration
+notificationsIssuerNode:
+  deployment:
+    labels:
+      app: notifications-issuer-node-deployment
+      environment: dev
+
+# Dev-specific pending publisher configuration
+pendingPublisherIssuerNode:
+  deployment:
+    labels:
+      app: pending-publisher-issuer-node-deployment
+      environment: dev
+
+# TLS secret for dev-internal domain (created by certificate-wildcard-dev-internal.yaml)
+ingress-nginx:
+  enabled: true
+  tlsSecretName: dev-internal-wildcard-tls

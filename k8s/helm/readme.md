@@ -147,6 +147,26 @@ kubectl apply -f k8s/helm/charts/ingress-nginx/certificate-wildcard-internal.yam
 kubectl get certificate internal-wildcard-tls -n trustid-issuer -w
 ```
 
+### cert-manager DNS Resolution
+
+cert-manager is configured to use public DNS (`8.8.8.8`, `1.1.1.1`) for ACME DNS-01 challenge verification via `k8s/helm/charts/cert-manager-values.yaml`. This is required because the Azure Private DNS zone for `internal.trustid.life` has a wildcard A record (`*.internal.trustid.life → 10.3.0.10`) that intercepts `_acme-challenge` queries inside the cluster, preventing the CNAME from resolving to the acmeDNS server.
+
+**Install cert-manager with these values:**
+```bash
+helm install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --set installCRDs=true \
+  -f k8s/helm/charts/cert-manager-values.yaml
+```
+
+**Upgrade existing cert-manager:**
+```bash
+helm upgrade cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  -f k8s/helm/charts/cert-manager-values.yaml
+```
+
 ### Troubleshooting
 
 - Check certificate status: `kubectl describe certificate internal-wildcard-tls -n trustid-issuer`

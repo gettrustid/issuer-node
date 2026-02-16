@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: dev-internal-wildcard-tls
+  namespace: trustid-issuer-dev
+spec:
+  secretName: dev-internal-wildcard-tls
+  issuerRef:
+    name: le-dev-acmedns
+    kind: ClusterIssuer
+    group: cert-manager.io
+  dnsNames:
+    - '*.dev-internal.trustid.life'

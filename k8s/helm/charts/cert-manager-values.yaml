@@ -1,0 +1,11 @@
+# cert-manager Helm values
+# Used with: helm install cert-manager jetstack/cert-manager -f cert-manager-values.yaml
+#
+# dns01-recursive-nameservers: Forces cert-manager to verify ACME DNS-01 challenge
+# propagation via public DNS (Google/Cloudflare) instead of cluster-local DNS.
+# This is required because the Azure Private DNS zone for internal.trustid.life
+# has a wildcard A record that intercepts _acme-challenge queries, preventing
+# cert-manager from resolving the CNAME to the acmeDNS server.
+extraArgs:
+  - --dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53
+  - --dns01-recursive-nameservers-only

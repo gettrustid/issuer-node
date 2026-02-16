@@ -2,7 +2,18 @@
 
 1. Install cert-manager
 ```shell
-helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.14.24 --set installCRDs=true
+helm install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --version v1.14.24 \
+  --set installCRDs=true \
+  -f ../cert-manager-values.yaml
+```
+
+To upgrade an existing cert-manager installation with the values:
+```shell
+helm upgrade cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  -f ../cert-manager-values.yaml
 ```
 
 2. Create a secret with the Cloudflare API token:

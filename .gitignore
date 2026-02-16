@@ -37,6 +37,9 @@ kms_localstorage_keys.json
 .DS_STORE
 
 values.secrets.yaml
+values.secrets-dev.yaml
+
+.claude/
 
 # ACME DNS credentials
 k8s/helm/charts/ingress-nginx/acmedns.json

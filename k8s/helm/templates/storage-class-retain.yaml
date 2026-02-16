@@ -1,3 +1,4 @@
+{{- if not .Values.skipStorageClass }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -9,4 +10,5 @@ reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true
 parameters:
-  skuName: Standard_LRS  
+  skuName: Standard_LRS
+{{- end }}

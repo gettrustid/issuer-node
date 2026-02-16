@@ -13,7 +13,7 @@ spec:
   - hosts:
     - {{ .Values.global.apidomain }}
     - {{ .Values.global.uidomain }}
-    secretName: internal-wildcard-tls
+    secretName: {{ .Values.tlsSecretName | default "internal-wildcard-tls" }}
   rules:
   - host: {{ .Values.global.apidomain }}
     http:
