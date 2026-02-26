@@ -151,8 +151,8 @@ helm dependency update
 helm upgrade --install issuer-node-dev . \
   -f values.yaml \
   -f values-dev.yaml \
-  -n trustid-issuer-dev \
-  --create-namespace
+  -n trustid-issuer-dev 
+  # --create-namespace
 
 # Verify deployment
 kubectl get pods -n trustid-issuer-dev

@@ -18,7 +18,7 @@ apiIssuerNode:
     # Debug logging for dev environment
     issuerLogLevel: "-4"
     # Dev deep link server
-    issuerDeepLinkServerUrl: "https://dev.trustid.life/api"
+    issuerDeepLinkServerUrl: "https://api.dev-external.trustid.life/api"
   deployment:
     labels:
       app: api-issuer-node-deployment

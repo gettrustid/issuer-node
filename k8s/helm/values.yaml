@@ -75,8 +75,7 @@ apiIssuerNode:
     issuerCredentialStatusPublishingKeyPath: pbkey
     issuerIpfsGatewayUrl: https://ipfs.io
     issuerKMSProviderLocalStorageFilePath: /localstoragekeys
-    # issuerDeepLinkServerUrl: "https://api.trustid.life/api" #TODO: REVER POST DEV TESTING
-    issuerDeepLinkServerUrl: "https://dev.trustid.life/api"
+    issuerDeepLinkServerUrl: "https://api.trustid.life/api" 
 
 notificationsIssuerNode:
   deployment:
